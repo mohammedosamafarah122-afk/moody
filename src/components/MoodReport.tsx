@@ -1,43 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useMood } from '../contexts/MoodContext';
-import { Download, TrendingUp, TrendingDown, Minus, Calendar } from 'lucide-react';
-import MoodCharts from './MoodCharts';
+import { Download, TrendingUp, TrendingDown, Minus, BarChart3 } from 'lucide-react';
 
 const MoodReport: React.FC = () => {
-  const { moodEntries } = useMood();
+  const { moodEntries, loading } = useMood();
   const [dateRange, setDateRange] = useState<'all' | 'month' | 'week'>('all');
 
-  const filteredEntries = moodEntries.filter(entry => {
-    if (dateRange === 'all') return true;
+  const filteredEntries = useMemo(() => {
+    if (dateRange === 'all') return moodEntries;
     
-    const entryDate = new Date(entry.date);
     const now = new Date();
-    
-    if (dateRange === 'week') {
-      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      return entryDate >= oneWeekAgo;
-    } else if (dateRange === 'month') {
-      const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-      return entryDate >= oneMonthAgo;
-    }
-    
-    return true;
-  });
+    let startDate: Date;
 
-  const generateReport = () => {
+    if (dateRange === 'week') {
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else { // month
+      startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    }
+
+    return moodEntries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= startDate;
+    });
+  }, [moodEntries, dateRange]);
+
+  const report = useMemo(() => {
     if (filteredEntries.length === 0) {
       return {
         totalEntries: 0,
         mostCommonMood: 'No data',
         averageIntensity: 0,
         moodDistribution: {},
-        trend: 'stable',
+        trend: 'stable' as const,
         streak: 0,
-        insights: []
+        insights: [] as string[]
       };
     }
 
-    // Mood distribution
+    // Mood distribution based on mood_score
     const moodDistribution = filteredEntries.reduce((acc, entry) => {
       const moodLabel = getMoodLabel(entry.mood_score);
       acc[moodLabel] = (acc[moodLabel] || 0) + 1;
@@ -51,31 +51,39 @@ const MoodReport: React.FC = () => {
     // Average intensity
     const entriesWithIntensity = filteredEntries.filter(e => e.intensity);
     const averageIntensity = entriesWithIntensity.length > 0 
-      ? Math.round(entriesWithIntensity.reduce((sum, e) => sum + (e.intensity || 0), 0) / entriesWithIntensity.length)
+      ? Number((entriesWithIntensity.reduce((sum, e) => sum + (e.intensity || 0), 0) / entriesWithIntensity.length).toFixed(1))
       : 0;
 
-    // Trend calculation
-    const sortedEntries = [...filteredEntries].sort((a, b) => 
+    // Average mood score
+    const averageMoodScore = Number((filteredEntries.reduce((sum, e) => sum + e.mood_score, 0) / filteredEntries.length).toFixed(1));
+
+    // Trend calculation (based on mood score improvement)
+    const sortedByDate = [...filteredEntries].sort((a, b) => 
       new Date(a.date).getTime() - new Date(b.date).getTime()
     );
     
-    const firstHalf = sortedEntries.slice(0, Math.floor(sortedEntries.length / 2));
-    const secondHalf = sortedEntries.slice(Math.floor(sortedEntries.length / 2));
-    
-    const firstHalfAvg = firstHalf.length;
-    const secondHalfAvg = secondHalf.length;
+    const half = Math.floor(sortedByDate.length / 2);
+    const firstHalf = sortedByDate.slice(0, half);
+    const secondHalf = sortedByDate.slice(half);
     
     let trend: 'improving' | 'declining' | 'stable' = 'stable';
-    if (secondHalfAvg > firstHalfAvg * 1.3) trend = 'improving';
-    else if (secondHalfAvg < firstHalfAvg * 0.7) trend = 'declining';
+    if (firstHalf.length > 0 && secondHalf.length > 0) {
+      const firstHalfAvg = firstHalf.reduce((sum, e) => sum + e.mood_score, 0) / firstHalf.length;
+      const secondHalfAvg = secondHalf.reduce((sum, e) => sum + e.mood_score, 0) / secondHalf.length;
+      
+      if (secondHalfAvg > firstHalfAvg + 0.3) trend = 'improving';
+      else if (secondHalfAvg < firstHalfAvg - 0.3) trend = 'declining';
+    }
 
-    // Streak calculation (consecutive days with entries)
+    // Streak calculation
     let streak = 0;
     const today = new Date();
+    const dates = new Set(filteredEntries.map(entry => entry.date));
+    
     for (let i = 0; i < 365; i++) {
       const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
       const dateStr = date.toISOString().split('T')[0];
-      if (filteredEntries.some(entry => entry.date === dateStr)) {
+      if (dates.has(dateStr)) {
         streak++;
       } else {
         break;
@@ -83,23 +91,40 @@ const MoodReport: React.FC = () => {
     }
 
     // Generate insights
-    const insights = [];
-    if (streak >= 7) insights.push(`Great job! You've tracked your mood for ${streak} consecutive days.`);
-    if (trend === 'improving') insights.push("Your mood tracking frequency is increasing - keep it up!");
-    if (Object.keys(moodDistribution).length >= 5) insights.push("You're experiencing a good range of emotions.");
+    const insights: string[] = [];
+    if (streak >= 3) {
+      insights.push(`You're on a ${streak}-day tracking streak! Keep it up.`);
+    }
+    if (Object.keys(moodDistribution).length >= 3) {
+      insights.push("You're experiencing a diverse range of emotions.");
+    }
+    if (averageIntensity >= 7) {
+      insights.push("You tend to feel emotions intensely.");
+    } else if (averageIntensity <= 4) {
+      insights.push("You generally experience mild emotional intensity.");
+    }
+    if (averageMoodScore >= 4) {
+      insights.push("You're generally feeling positive overall.");
+    } else if (averageMoodScore <= 2) {
+      insights.push("Consider reaching out for support if you're feeling down.");
+    }
+    if (trend === 'improving') {
+      insights.push("Your mood has been improving over time - great progress!");
+    } else if (trend === 'declining') {
+      insights.push("Your mood has been declining - consider self-care activities.");
+    }
 
     return {
       totalEntries: filteredEntries.length,
       mostCommonMood,
       averageIntensity,
+      averageMoodScore,
       moodDistribution,
       trend,
       streak,
       insights
     };
-  };
-
-  const report = generateReport();
+  }, [filteredEntries]);
 
   const downloadReport = () => {
     const reportData = `
@@ -110,6 +135,7 @@ Time Range: ${dateRange === 'all' ? 'All Time' : dateRange === 'week' ? 'Past We
 SUMMARY:
 • Total Entries: ${report.totalEntries}
 • Most Common Mood: ${report.mostCommonMood}
+• Average Mood Score: ${report.averageMoodScore}/5
 • Average Intensity: ${report.averageIntensity}/10
 • Current Streak: ${report.streak} days
 • Trend: ${report.trend}
@@ -143,13 +169,27 @@ Thank you for using Moody to track your emotional well-being!
     }
   };
 
-  const getTrendColor = () => {
-    switch (report.trend) {
-      case 'improving': return 'text-green-600 bg-green-50 border-green-200';
-      case 'declining': return 'text-red-600 bg-red-50 border-red-200';
-      default: return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    }
+  const getMoodEmoji = (moodLabel: string) => {
+    const emojiMap: { [key: string]: string } = {
+      'Terrible': '😢',
+      'Poor': '😔',
+      'Okay': '😐',
+      'Good': '😊',
+      'Excellent': '🤩',
+    };
+    return emojiMap[moodLabel] || '😐';
   };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mr-3"></div>
+          <span className="text-gray-600">Generating your report...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
@@ -188,40 +228,84 @@ Thank you for using Moody to track your emotional well-being!
       <div className="p-6">
         {report.totalEntries === 0 ? (
           <div className="text-center py-12">
-            <Calendar size={48} className="mx-auto text-gray-300 mb-4" />
+            <BarChart3 size={48} className="mx-auto text-gray-300 mb-4" />
             <h3 className="text-lg font-semibold text-gray-600 mb-2">No data available</h3>
             <p className="text-gray-500">Start tracking your mood to generate reports.</p>
           </div>
         ) : (
           <>
-            {/* Charts */}
-            <MoodCharts moodEntries={filteredEntries} />
-
             {/* Key Metrics */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
               <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                 <h3 className="text-sm font-medium text-blue-800 mb-1">Total Entries</h3>
                 <p className="text-2xl font-bold text-blue-600">{report.totalEntries}</p>
               </div>
               
               <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-                <h3 className="text-sm font-medium text-green-800 mb-1">Most Common Mood</h3>
-                <p className="text-lg font-bold text-green-600 truncate">{report.mostCommonMood}</p>
+                <h3 className="text-sm font-medium text-green-800 mb-1">Common Mood</h3>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{getMoodEmoji(report.mostCommonMood)}</span>
+                  <p className="text-sm font-bold text-green-600 truncate" title={report.mostCommonMood}>
+                    {report.mostCommonMood}
+                  </p>
+                </div>
               </div>
               
               <div className="bg-purple-50 p-4 rounded-xl border border-purple-100">
-                <h3 className="text-sm font-medium text-purple-800 mb-1">Current Streak</h3>
-                <p className="text-2xl font-bold text-purple-600">{report.streak} days</p>
+                <h3 className="text-sm font-medium text-purple-800 mb-1">Avg Mood</h3>
+                <p className="text-2xl font-bold text-purple-600">{report.averageMoodScore}/5</p>
               </div>
               
+              <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                <h3 className="text-sm font-medium text-indigo-800 mb-1">Avg Intensity</h3>
+                <p className="text-2xl font-bold text-indigo-600">{report.averageIntensity}/10</p>
+              </div>
+
               <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
-                <h3 className="text-sm font-medium text-orange-800 mb-1">Trend</h3>
+                <h3 className="text-sm font-medium text-orange-800 mb-1">Current Streak</h3>
+                <p className="text-2xl font-bold text-orange-600">{report.streak} days</p>
+              </div>
+              
+              <div className="bg-teal-50 p-4 rounded-xl border border-teal-100">
+                <h3 className="text-sm font-medium text-teal-800 mb-1">Trend</h3>
                 <div className="flex items-center gap-2">
                   {getTrendIcon()}
-                  <span className={`text-sm font-bold capitalize ${getTrendColor().split(' ')[0]}`}>
+                  <span className={`text-sm font-bold capitalize ${
+                    report.trend === 'improving' ? 'text-green-600' : 
+                    report.trend === 'declining' ? 'text-red-600' : 'text-yellow-600'
+                  }`}>
                     {report.trend}
                   </span>
                 </div>
+              </div>
+            </div>
+
+            {/* Mood Distribution Chart */}
+            <div className="bg-gray-50 p-6 rounded-2xl mb-6">
+              <h3 className="font-semibold text-gray-800 mb-4">Mood Distribution</h3>
+              <div className="space-y-3">
+                {Object.entries(report.moodDistribution)
+                  .sort(([,a], [,b]) => b - a)
+                  .map(([mood, count]) => {
+                    const percentage = (count / report.totalEntries) * 100;
+                    return (
+                      <div key={mood} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 flex-1">
+                          <span className="text-2xl">{getMoodEmoji(mood)}</span>
+                          <span className="text-sm font-medium text-gray-700 flex-1">{mood}</span>
+                          <span className="text-sm text-gray-500 w-12 text-right">{count}</span>
+                        </div>
+                        <div className="w-32">
+                          <div className="bg-gray-200 rounded-full h-3">
+                            <div 
+                              className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all"
+                              style={{ width: `${percentage}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
 
