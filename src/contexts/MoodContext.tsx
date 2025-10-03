@@ -88,8 +88,10 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
           mood_score: mood_score,
           journal_entry: notes || '',
           intensity: intensity || 5,
-          created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,date',
+          ignoreDuplicates: false
         })
         .select()
         .single();
