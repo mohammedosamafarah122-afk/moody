@@ -4,7 +4,7 @@ import QuickActions from './QuickActions';
 import MoodHistory from './MoodHistory';
 import MoodReport from './MoodReport';
 import StatsCards from './StatsCards';
-import { LoadingSpinner } from './LoadingSpinner';
+import LoadingSpinner from './LoadingSpinner';
 
 const Dashboard: React.FC = () => {
   const { fetchMoodEntries, loading, moodEntries, stats } = useMood();
