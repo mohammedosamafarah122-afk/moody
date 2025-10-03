@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useAuth } from './AuthContext'
-import { moodService, type CreateMoodEntryData } from '../services/moodService'
+import { moodService } from '../services/moodService'
+import { supabase } from '../lib/supabase'
 import type { MoodEntry } from '../lib/supabase'
 
 interface MoodContextType {
   moodEntries: MoodEntry[]
   loading: boolean
-  addMoodEntry: (mood: string, notes?: string, intensity?: number) => Promise<void>
+  addMoodEntry: (mood: string, notes?: string, intensity?: number) => Promise<MoodEntry>
   refreshMoodEntries: () => Promise<void>
 }
 
@@ -48,7 +49,8 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
   }, [user])
 
   const addMoodEntry = async (mood: string, notes?: string, intensity?: number) => {
-    if (!user) throw new Error('User not authenticated')
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
 
     // Convert mood string to mood_score number
     const moodScoreMap: Record<string, number> = {
@@ -73,26 +75,27 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
     // Extract mood label from emoji + label format
     const moodLabel = mood.replace(/^[^\w\s]*\s*/, '').toLowerCase()
     const mood_score = moodScoreMap[moodLabel] || 3
-    const today = new Date().toISOString().split('T')[0]
 
-    const moodData: CreateMoodEntryData = {
-      date: today,
-      mood_score,
-      intensity: intensity || 5,
-      journal_entry: notes || `Feeling ${mood} today`
-    }
+    const { data, error } = await supabase
+      .from('mood_entries')
+      .upsert({
+        user_id: user.id,
+        date: new Date().toISOString().split('T')[0],
+        mood_score,
+        journal_entry: notes,
+        intensity,
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
 
-    try {
-      const { error } = await moodService.createMoodEntry(moodData)
-      if (error) {
-        throw error
-      }
-      // Refresh the mood entries after adding
-      await refreshMoodEntries()
-    } catch (error) {
-      console.error('Error adding mood entry:', error)
-      throw error
-    }
+    if (error) throw error;
+    
+    setMoodEntries(prev => [data, ...prev.filter(e => 
+      e.date !== data.date || e.user_id !== data.user_id
+    )]);
+    
+    return data;
   }
 
   useEffect(() => {
