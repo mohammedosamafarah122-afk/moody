@@ -127,17 +127,19 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
 
         {/* Tags */}
         <div className="p-6 border-t">
-          <h3 className="font-semibold mb-3 text-gray-700">Add tags</h3>
+          <h3 className="font-semibold mb-3 text-gray-700">Add tags (optional)</h3>
+          
+          {/* Common Tags */}
           <div className="flex flex-wrap gap-2 mb-3">
             {commonTags.map(tag => (
               <button
                 key={tag}
                 onClick={() => handleAddTag(tag)}
                 disabled={tags.includes(tag)}
-                className={`px-3 py-1 rounded-full text-sm ${
+                className={`px-3 py-1 rounded-full text-sm border transition-colors ${
                   tags.includes(tag)
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-blue-500 text-white border-blue-500'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                 }`}
               >
                 #{tag}
@@ -145,31 +147,38 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
             ))}
           </div>
           
-          <div className="flex gap-2">
+          {/* Custom Tag Input */}
+          <div className="flex gap-2 mb-3">
             <input
               type="text"
               value={customTag}
               onChange={(e) => setCustomTag(e.target.value)}
-              placeholder="Custom tag..."
+              placeholder="Add custom tag..."
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
               onKeyPress={(e) => e.key === 'Enter' && handleAddCustomTag()}
             />
             <button
               onClick={handleAddCustomTag}
-              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg"
+              disabled={!customTag.trim() || tags.length >= 5}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               <Plus size={16} />
             </button>
           </div>
           
+          {/* Selected Tags Display */}
           {tags.length > 0 && (
             <div className="mt-3">
+              <p className="text-sm text-gray-600 mb-2">Selected tags:</p>
               <div className="flex flex-wrap gap-2">
                 {tags.map(tag => (
-                  <span key={tag} className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                  <span key={tag} className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm border border-blue-200">
                     <Hash size={12} className="mr-1" />
                     {tag}
-                    <button onClick={() => handleRemoveTag(tag)} className="ml-1 hover:text-blue-600">
+                    <button 
+                      onClick={() => handleRemoveTag(tag)} 
+                      className="ml-1 hover:text-blue-600 transition-colors"
+                    >
                       <X size={12} />
                     </button>
                   </span>
