@@ -60,10 +60,10 @@ export const IntelligentAnalytics: React.FC = () => {
           <span className="text-lg">💡</span>
           <span>Smart Recommendations</span>
         </h4>
-        <ul className="space-y-2">
+        <ul className="space-y-2" style={{ listStyle: 'none', padding: 0 }}>
           {recommendations.map((rec, index) => (
-            <li key={index} className="flex items-start space-x-2 text-sm text-gray-700">
-              <span className="text-purple-500 mt-0.5">•</span>
+            <li key={index} className="flex items-start space-x-2 text-sm text-gray-700" style={{ marginBottom: '8px' }}>
+              <span className="text-purple-500 mt-0.5" style={{ marginRight: '8px' }}>•</span>
               <span>{rec}</span>
             </li>
           ))}
