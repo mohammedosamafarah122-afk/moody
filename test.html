@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moody - Basic Test</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        .status {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Moody Test Page</h1>
+        <p>If you can see this, your server is working perfectly!</p>
+        
+        <div class="status">
+            <h3>Server Status: ✅ RUNNING</h3>
+            <p>Port: 5173</p>
+            <p>Protocol: HTTP</p>
+        </div>
+        
+        <button onclick="alert('JavaScript is working! 🚀')" 
+                style="padding: 15px 30px; font-size: 1.2rem; background: white; color: #667eea; border: none; border-radius: 10px; cursor: pointer;">
+            Test JavaScript
+        </button>
+    </div>
+
+    <script>
+        console.log('✅ Basic HTML test loaded successfully!');
+        console.log('Server is running on:', window.location.href);
+    </script>
+</body>
+</html>

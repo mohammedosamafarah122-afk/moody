@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moody - Vibrant Purple Gradient Dashboard Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#667eea',
+                        secondary: '#764ba2',
+                        accent: '#06b6d4',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        error: '#ef4444',
+                    },
+                    backgroundImage: {
+                        'gradient-primary': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        'gradient-rainbow': 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #06b6d4 50%, #10b981 75%, #f59e0b 100%)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            box-shadow: 
+                0 12px 40px rgba(102, 126, 234, 0.15),
+                0 4px 16px rgba(118, 75, 162, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+        
+        .glass-card-purple {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            box-shadow: 
+                0 16px 48px rgba(102, 126, 234, 0.2),
+                0 8px 24px rgba(118, 75, 162, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+        
+        .mood-indicator {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .mood-indicator:hover {
+            transform: scale(1.1);
+        }
+        
+        .mood-1 { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .mood-2 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .mood-3 { background: linear-gradient(135deg, #eab308, #ca8a04); }
+        .mood-4 { background: linear-gradient(135deg, #10b981, #059669); }
+        .mood-5 { background: linear-gradient(135deg, #667eea, #764ba2); }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .animate-gradient {
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .heatmap-cell {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .heatmap-cell:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 min-h-screen">
+    <div class="container mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="glass-card p-8 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent animate-gradient mb-4">
+                        🎭 Moody Dashboard - Vibrant Purple Demo
+                    </h1>
+                    <p class="text-gray-600 text-lg">
+                        Experience the vibrant purple gradient aesthetic with glass morphism and intelligent analytics
+                    </p>
+                </div>
+                <div class="hidden md:block">
+                    <div class="w-32 h-32 rounded-full bg-gradient-rainbow bg-clip-text text-transparent flex items-center justify-center text-6xl animate-pulse">
+                        🎨
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="glass-card-purple rounded-2xl p-8 mb-8 animate-float">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">
+                        Good evening! ☀️
+                    </h2>
+                    <p class="text-gray-600 mb-4">
+                        Your mood tracking dashboard features vibrant purple gradients, glass morphism effects, and intelligent analytics.
+                    </p>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-500">Your mood trend:</span>
+                        <div class="inline-flex items-center space-x-2 px-3 py-2 rounded-full bg-green-100">
+                            <span class="text-sm">📈</span>
+                            <span class="text-sm font-medium text-green-700">Improving 15%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Glass Morphism Card -->
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center text-white text-xl">
+                        ✨
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Glass Morphism</h3>
+                        <p class="text-sm text-gray-600">Enhanced blur effects</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-700">
+                    Sophisticated glass cards with 25-30px backdrop blur, layered shadows, and premium transparency effects.
+                </p>
+            </div>
+
+            <!-- Animated Visualizations -->
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center text-white text-xl">
+                        📊
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Smart Analytics</h3>
+                        <p class="text-sm text-gray-600">Intelligent insights</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-700">
+                    AI-driven mood pattern analysis with weekly heatmaps, trend visualization, and personalized recommendations.
+                </p>
+            </div>
+
+            <!-- Purple Gradients -->
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center text-white text-xl">
+                        🌈
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Purple Aesthetics</h3>
+                        <p class="text-sm text-gray-600">#667eea to #764ba2</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-700">
+                    Vibrant purple gradient design throughout the interface with professional color harmony and visual appeal.
+                </p>
+            </div>
+        </div>
+
+        <!-- Mood Indicators Demo -->
+        <div class="glass-card p-6 rounded-2xl mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                😊 Colorful Mood Indicators
+                <span class="ml-2 text-sm font-normal text-gray-600">Interactive emoji reactions</span>
+            </h3>
+            
+            <div class="flex justify-center space-x-8">
+                <div class="text-center">
+                    <div class="mood-indicator mood-1">😢</div>
+                    <p class="text-sm font-medium mt-2">Terrible</p>
+                    <p class="text-xs text-gray-500">1/5</p>
+                </div>
+                <div class="text-center">
+                    <div class="mood-indicator mood-2">😔</div>
+                    <p class="text-sm font-medium mt-2">Poor</p>
+                    <p class="text-xs text-gray-500">2/5</p>
+                </div>
+                <div class="text-center">
+                    <div class="mood-indicator mood-3">😐</div>
+                    <p class="text-sm font-medium mt-2">Okay</p>
+                    <p class="text-xs text-gray-500">3/5</p>
+                </div>
+                <div class="text-center">
+                    <div class="mood-indicator mood-4">😊</div>
+                    <p class="text-sm font-medium mt-2">Good</p>
+                    <p class="text-xs text-gray-500">4/5</p>
+                </div>
+                <div class="text-center">
+                    <div class="mood-indicator mood-5">🤩</div>
+                    <p class="text-sm font-medium mt-2">Excellent</p>
+                    <p class="text-xs text-gray-500">5/5</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Pattern Heatmap -->
+        <div class="glass-card-purple p-6 rounded-2xl mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                📊 Weekly Mood Pattern Heatmap
+                <span class="ml-2 text-sm font-normal text-gray-600">(Interactive mood visualization)</span>
+            </h3>
+            
+            <div class="grid grid-cols-7 gap-3 mb-4">
+                <div class="text-center">
+                    <div class="text-xs font-medium text-gray-600 mb-2">Mon</div>
+                    <div class="heatmap-cell bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center text-white text-xs font-bold">4.2</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs font-medium text-gray-600 mb-2">Tue</div>
+                    <div class="heatmap-cell bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center text-white text-xs font-bold">4.8</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs font-medium text-gray-600 mb-2">Wed</div>
+                    <div class="heatmap-cell bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center text-white text-xs font-bold">4.1</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs font-medium text-gray-600 mb-2">Thu</div>
+                    <div class="heatmap-cell bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center text-white text-xs font-bold">3.5</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs font-medium text-gray-600 mb-2">Fri</div>
+                    <div class="heatmap-cell bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center text-white text-xs font-bold">4.6</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs font-medium text-gray-600 mb-2">Sat</div>
+                    <div class="heatmap-cell bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center text-white text-xs font-bold">4.9</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs font-medium text-gray-600 mb-2">Sun</div>
+                    <div class="heatmap-cell bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center text-white text-xs font-bold">4.3</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Insights -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="glass-card p-6 rounded-2xl">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    💡 Personalized Insights
+                </h3>
+                <div class="space-y-3">
+                    <div class="p-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+                        <p class="text-sm text-gray-700">🌟 You maintain a positive outlook most of the time!</p>
+                    </div>
+                    <div class="p-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+                        <p class="text-sm text-gray-700">📅 Your best days are typically Saturdays (4.9/5)</p>
+                    </div>
+                    <div class="p-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+                        <p class="text-sm text-gray-700">📈 Your mood tends to be lower on Thursdays (3.5/5)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-2xl">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    🎯 Smart Recommendations
+                </h3>
+                <div class="space-y-3">
+                    <div class="p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                        <p class="text-sm text-gray-700">Keep up the great work with your positive mindset!</p>
+                    </div>
+                    <div class="p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                        <p class="text-sm text-gray-700">Consider planning enjoyable activities for Thursdays</p>
+                    </div>
+                    <div class="p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                        <p class="text-sm text-gray-700">Your weekend mood is excellent - maintain this pattern!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Buttons -->
+        <div class="glass-card p-6 rounded-2xl mb-8">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                🔘 Interactive Elements
+            </h3>
+            <div class="flex flex-wrap gap-4">
+                <button class="bg-gradient-primary text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+                    Log New Mood
+                </button>
+                <button class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+                    View Analytics
+                </button>
+                <button class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+                    Export Data
+                </button>
+                <button class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+                    Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="glass-card p-6 bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center">
+                    <span class="text-white text-lg">✓</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Vibrant Purple Dashboard Active!</h3>
+                    <p class="text-gray-600">Experience the full power of gradient purple aesthetics, glass morphism, and intelligent analytics</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 text-gray-500">
+            <p>🎨 Moody Dashboard - Vibrant Purple Gradient Design with Glass Morphism & Intelligent Analytics</p>
+            <p class="text-sm mt-2">Visit <strong>http://localhost:5173/dashboard</strong> to access the full application</p>
+        </div>
+    </div>
+</body>
+</html>
