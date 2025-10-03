@@ -49,53 +49,69 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
   }, [user])
 
   const addMoodEntry = async (mood: string, notes?: string, intensity?: number) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-    // Convert mood string to mood_score number
-    const moodScoreMap: Record<string, number> = {
-      '😊 happy': 5,
-      '😐 neutral': 3,
-      '😔 sad': 2,
-      '😡 angry': 1,
-      '😴 tired': 2,
-      '😰 anxious': 2,
-      '🤩 excited': 5,
-      '😌 relaxed': 4,
-      'happy': 5,
-      'neutral': 3,
-      'sad': 2,
-      'angry': 1,
-      'tired': 2,
-      'anxious': 2,
-      'excited': 5,
-      'relaxed': 4
+      // Convert mood string to mood_score number
+      const moodScoreMap: Record<string, number> = {
+        '😊 happy': 5,
+        '😐 neutral': 3,
+        '😔 sad': 2,
+        '😡 angry': 1,
+        '😴 tired': 2,
+        '😰 anxious': 2,
+        '🤩 excited': 5,
+        '😌 relaxed': 4,
+        'happy': 5,
+        'neutral': 3,
+        'sad': 2,
+        'angry': 1,
+        'tired': 2,
+        'anxious': 2,
+        'excited': 5,
+        'relaxed': 4
+      }
+
+      // Extract mood label from emoji + label format
+      const moodLabel = mood.replace(/^[^\w\s]*\s*/, '').toLowerCase()
+      const mood_score = moodScoreMap[moodLabel] || 3
+
+      // Format the date correctly
+      const today = new Date().toISOString().split('T')[0];
+      
+      const { data, error } = await supabase
+        .from('mood_entries')
+        .upsert({
+          user_id: user.id,
+          date: today,
+          mood_score: mood_score,
+          journal_entry: notes || '',
+          intensity: intensity || 5,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      // Update local state
+      setMoodEntries(prev => {
+        const filtered = prev.filter(entry => 
+          !(entry.date === today && entry.user_id === user.id)
+        );
+        return [data, ...filtered];
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Error in addMoodEntry:', error);
+      throw error;
     }
-
-    // Extract mood label from emoji + label format
-    const moodLabel = mood.replace(/^[^\w\s]*\s*/, '').toLowerCase()
-    const mood_score = moodScoreMap[moodLabel] || 3
-
-    const { data, error } = await supabase
-      .from('mood_entries')
-      .upsert({
-        user_id: user.id,
-        date: new Date().toISOString().split('T')[0],
-        mood_score,
-        journal_entry: notes,
-        intensity,
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    
-    setMoodEntries(prev => [data, ...prev.filter(e => 
-      e.date !== data.date || e.user_id !== data.user_id
-    )]);
-    
-    return data;
   }
 
   useEffect(() => {
