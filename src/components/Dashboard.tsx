@@ -6,6 +6,7 @@ import { MoodChart } from './MoodChart'
 import { CalendarHeatmap } from './CalendarHeatmap'
 import QuickActions from './QuickActions'
 import MoodHistory from './MoodHistory'
+import MoodReport from './MoodReport'
 import { StatsCards } from './StatsCards'
 import { LoadingSpinner } from './LoadingSpinner'
 import { ColorfulMoodIndicator, MoodTrendIndicator } from './ColorfulMoodIndicator'
@@ -250,6 +251,15 @@ export const Dashboard: React.FC = () => {
                       <h3 className="text-xl font-bold text-gray-800">Recent History</h3>
                     </div>
                     <MoodHistory />
+                  </div>
+
+                  {/* Mood Report Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-sm font-bold">📊</div>
+                      <h3 className="text-xl font-bold text-gray-800">Mood Report</h3>
+                    </div>
+                    <MoodReport />
                   </div>
                 </div>
 
