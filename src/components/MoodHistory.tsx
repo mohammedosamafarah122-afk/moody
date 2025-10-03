@@ -1,12 +1,17 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useMood } from '../contexts/MoodContext';
 import { Calendar, Search, Loader } from 'lucide-react';
 
 const MoodHistory: React.FC = () => {
-  const { moodEntries, loading } = useMood();
+  const { moodEntries, loading, fetchMoodEntries } = useMood();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMood, setSelectedMood] = useState('all');
   const [dateRange, setDateRange] = useState('all');
+
+  // Fetch entries when component mounts
+  useEffect(() => {
+    fetchMoodEntries();
+  }, [fetchMoodEntries]);
 
   const filteredEntries = useMemo(() => {
     let filtered = moodEntries;
