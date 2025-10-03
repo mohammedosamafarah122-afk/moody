@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { MoodProvider } from './contexts/MoodContext'
 import { Layout } from './components/Layout/Layout'
 import { AuthForm } from './components/Auth/AuthForm'
 import { Dashboard } from './components/Dashboard'
@@ -115,11 +116,13 @@ const AppRoutes: React.FC = () => {
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
-          <AppRoutes />
-        </div>
-      </Router>
+      <MoodProvider>
+        <Router>
+          <div className="min-h-screen bg-gray-50">
+            <AppRoutes />
+          </div>
+        </Router>
+      </MoodProvider>
     </AuthProvider>
   )
 }

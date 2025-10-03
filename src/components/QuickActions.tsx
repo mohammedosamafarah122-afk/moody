@@ -1,44 +1,56 @@
 import React from 'react'
+import { useMood } from '../contexts/MoodContext'
 
-export const QuickActions: React.FC = () => {
-  const handleAddMood = () => {
-    // Navigate to mood logging or open modal
-    console.log('Add mood entry clicked')
-  }
+const QuickActions: React.FC = () => {
+  const { addMoodEntry } = useMood()
 
-  const handleViewHistory = () => {
-    // Navigate to calendar view
-    console.log('View history clicked')
-  }
-
-  const handleGenerateReport = () => {
-    // Navigate to analytics or generate report
-    console.log('Generate report clicked')
+  const handleAddMood = async (mood: string) => {
+    try {
+      await addMoodEntry(mood, `Feeling ${mood} today`)
+      alert('Mood saved successfully!')
+    } catch (error) {
+      console.error('Error saving mood:', error)
+      alert('Failed to save mood')
+    }
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow mb-6">
-      <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-      <div className="flex space-x-4">
+    <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+      <h2 className="text-xl font-bold mb-4 text-gray-800">Quick Actions</h2>
+      <div className="flex flex-wrap gap-3">
         <button 
-          onClick={handleAddMood}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors"
+          onClick={() => handleAddMood('😊 Happy')}
+          className="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-medium transition-colors"
         >
-          Add Mood Entry
+          😊 Happy
         </button>
         <button 
-          onClick={handleViewHistory}
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors"
+          onClick={() => handleAddMood('😐 Neutral')}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-lg font-medium transition-colors"
         >
-          View History
+          😐 Neutral
         </button>
         <button 
-          onClick={handleGenerateReport}
-          className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded transition-colors"
+          onClick={() => handleAddMood('😔 Sad')}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-colors"
         >
-          Generate Report
+          😔 Sad
+        </button>
+        <button 
+          onClick={() => handleAddMood('😡 Angry')}
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg font-medium transition-colors"
+        >
+          😡 Angry
+        </button>
+        <button 
+          onClick={() => handleAddMood('😴 Tired')}
+          className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-3 rounded-lg font-medium transition-colors"
+        >
+          😴 Tired
         </button>
       </div>
     </div>
   )
 }
+
+export default QuickActions
