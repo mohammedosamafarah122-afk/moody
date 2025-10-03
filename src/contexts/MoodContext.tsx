@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useAuth } from './AuthContext'
 import { moodService } from '../services/moodService'
 import { supabase } from '../lib/supabase'
@@ -9,6 +9,7 @@ interface MoodContextType {
   loading: boolean
   addMoodEntry: (mood: string, notes?: string, intensity?: number) => Promise<MoodEntry>
   refreshMoodEntries: () => Promise<void>
+  fetchMoodEntries: () => Promise<void>
 }
 
 const MoodContext = createContext<MoodContextType | undefined>(undefined)
@@ -29,6 +30,34 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
   const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([])
   const [loading, setLoading] = useState(false)
   const { user } = useAuth()
+
+  const fetchMoodEntries = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setMoodEntries([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('mood_entries')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching mood entries:', error);
+        return;
+      }
+
+      setMoodEntries(data || []);
+    } catch (error) {
+      console.error('Error in fetchMoodEntries:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const refreshMoodEntries = React.useCallback(async () => {
     if (!user) return
@@ -128,7 +157,8 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
     moodEntries,
     loading,
     addMoodEntry,
-    refreshMoodEntries
+    refreshMoodEntries,
+    fetchMoodEntries
   }
 
   return <MoodContext.Provider value={value}>{children}</MoodContext.Provider>
