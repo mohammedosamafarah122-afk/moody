@@ -107,9 +107,9 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
 
         {/* Intensity Slider */}
         <div className="p-6 border-t">
-          <div className="flex justify-between mb-2">
+          <div className="flex justify-between items-center mb-2">
             <h3 className="font-semibold text-gray-700">Intensity</h3>
-            <span className="text-sm text-gray-600">{intensity}/10</span>
+            <span className="text-sm font-medium text-blue-600">{intensity}/10</span>
           </div>
           <input
             type="range"
