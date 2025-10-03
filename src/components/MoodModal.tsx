@@ -53,7 +53,10 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
     }
 
     try {
-      const fullNotes = `${notes} ${tags.map(tag => `#${tag}`).join(' ')}`.trim();
+      // Combine notes and tags
+      const tagString = tags.map(tag => `#${tag}`).join(' ');
+      const fullNotes = notes ? `${notes} ${tagString}`.trim() : tagString;
+      
       await addMoodEntry(selectedMood, fullNotes, intensity);
       
       // Reset form
@@ -61,13 +64,14 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
       setNotes('');
       setIntensity(5);
       setTags([]);
+      setCustomTag('');
       onClose();
       
-      // Show success feedback
-      alert(`✅ ${selectedMood} mood recorded!`);
-    } catch (error) {
-      console.error('Failed to save mood entry:', error);
-      alert('Failed to save mood entry');
+      // Show success message
+      alert(`✅ ${selectedMood} mood recorded successfully!`);
+    } catch (error: any) {
+      console.error('Save error:', error);
+      alert(`Failed to save mood: ${error.message || 'Please try again'}`);
     }
   };
 
