@@ -54,7 +54,7 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
 
     try {
       const fullNotes = `${notes} ${tags.map(tag => `#${tag}`).join(' ')}`.trim();
-      await addMoodEntry(selectedMood, fullNotes);
+      await addMoodEntry(selectedMood, fullNotes, intensity);
       
       // Reset form
       setSelectedMood('');

@@ -33,6 +33,7 @@ export type MoodEntry = {
   user_id: string
   date: string
   mood_score: number
+  intensity?: number
   emotions?: string[]
   activities?: string[]
   journal_entry?: string

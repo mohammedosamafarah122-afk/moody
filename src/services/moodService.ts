@@ -5,6 +5,7 @@ export type { MoodEntry } from '../lib/supabase'
 export interface CreateMoodEntryData {
   date: string
   mood_score: number
+  intensity?: number
   emotions?: string[]
   activities?: string[]
   journal_entry?: string

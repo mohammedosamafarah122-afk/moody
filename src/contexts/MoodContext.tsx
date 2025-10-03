@@ -6,7 +6,7 @@ import type { MoodEntry } from '../lib/supabase'
 interface MoodContextType {
   moodEntries: MoodEntry[]
   loading: boolean
-  addMoodEntry: (mood: string, notes?: string) => Promise<void>
+  addMoodEntry: (mood: string, notes?: string, intensity?: number) => Promise<void>
   refreshMoodEntries: () => Promise<void>
 }
 
@@ -47,7 +47,7 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
     }
   }
 
-  const addMoodEntry = async (mood: string, notes?: string) => {
+  const addMoodEntry = async (mood: string, notes?: string, intensity?: number) => {
     if (!user) throw new Error('User not authenticated')
 
     // Convert mood string to mood_score number
@@ -78,6 +78,7 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
     const moodData: CreateMoodEntryData = {
       date: today,
       mood_score,
+      intensity: intensity || 5,
       journal_entry: notes || `Feeling ${mood} today`
     }
 
