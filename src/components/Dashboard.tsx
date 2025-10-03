@@ -8,6 +8,7 @@ import QuickActions from './QuickActions'
 import MoodHistory from './MoodHistory'
 import MoodReport from './MoodReport'
 import MoodModal from './MoodModal'
+import MoodCharts from './MoodCharts'
 import { StatsCards } from './StatsCards'
 import { LoadingSpinner } from './LoadingSpinner'
 import { ColorfulMoodIndicator, MoodTrendIndicator } from './ColorfulMoodIndicator'
@@ -370,6 +371,11 @@ export const Dashboard: React.FC = () => {
                       </div>
                       <IntelligentAnalytics />
                     </div>
+                  </div>
+
+                  {/* Mood Charts Section */}
+                  <div className="animate-slide-up" style={{ animationDelay: '0.6s' }}>
+                    <MoodCharts moodEntries={moodEntries} />
                   </div>
                 </div>
               </div>
