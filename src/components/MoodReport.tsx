@@ -229,14 +229,14 @@ Thank you for using Moody to track your emotional well-being!
             {report.insights.length > 0 && (
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl border border-blue-100">
                 <h3 className="font-semibold text-gray-800 mb-3">Personal Insights</h3>
-                <div className="space-y-2">
+                <ul className="space-y-2" style={{ listStyle: 'none', padding: 0 }}>
                   {report.insights.map((insight, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <li key={index} className="flex items-start space-x-3" style={{ marginBottom: '8px' }}>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" style={{ marginRight: '8px' }}></div>
                       <p className="text-gray-700">{insight}</p>
-                    </div>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             )}
           </>
