@@ -3,7 +3,7 @@ import { useMood } from '../contexts/MoodContext';
 import QuickActions from './QuickActions';
 import MoodHistory from './MoodHistory';
 import MoodReport from './MoodReport';
-import { StatsCards } from './StatsCards';
+import StatsCards from './StatsCards';
 
 const Dashboard: React.FC = () => {
   const { fetchMoodEntries } = useMood();
