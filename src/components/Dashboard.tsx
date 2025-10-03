@@ -507,7 +507,7 @@ function calculateStreak(entries: MoodEntry[]): number {
   today.setHours(0, 0, 0, 0)
   
   let streak = 0
-  let currentDate = new Date(today)
+  const currentDate = new Date(today)
   
   for (const entry of validEntries) {
     try {
@@ -520,9 +520,9 @@ function calculateStreak(entries: MoodEntry[]): number {
       } else if (entryDate.getTime() < currentDate.getTime()) {
         break
       }
-    } catch (error) {
+    } catch (err) {
       // Skip invalid date entries
-      console.warn('Invalid date in mood entry:', entry.date)
+      console.warn('Invalid date in mood entry:', entry.date, err)
       continue
     }
   }

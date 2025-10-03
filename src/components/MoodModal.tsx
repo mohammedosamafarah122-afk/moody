@@ -66,6 +66,7 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
       // Show success feedback
       alert(`✅ ${selectedMood} mood recorded!`);
     } catch (error) {
+      console.error('Failed to save mood entry:', error);
       alert('Failed to save mood entry');
     }
   };

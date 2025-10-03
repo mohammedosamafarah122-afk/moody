@@ -29,7 +29,7 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(false)
   const { user } = useAuth()
 
-  const refreshMoodEntries = async () => {
+  const refreshMoodEntries = React.useCallback(async () => {
     if (!user) return
     
     setLoading(true)
@@ -45,7 +45,7 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
 
   const addMoodEntry = async (mood: string, notes?: string, intensity?: number) => {
     if (!user) throw new Error('User not authenticated')
@@ -101,7 +101,7 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
     } else {
       setMoodEntries([])
     }
-  }, [user])
+  }, [user, refreshMoodEntries])
 
   const value = {
     moodEntries,
