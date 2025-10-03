@@ -49,10 +49,19 @@ export class ErrorBoundary extends Component<Props, State> {
             <p style={{ fontSize: '1.1rem', marginBottom: '20px' }}>
               The Moody app encountered an error. This is likely due to:
             </p>
-            <ul style={{ textAlign: 'left', marginBottom: '20px' }}>
-              <li>Missing Supabase database setup</li>
-              <li>Network connectivity issues</li>
-              <li>Configuration problems</li>
+            <ul style={{ textAlign: 'left', marginBottom: '20px', listStyle: 'none', padding: 0 }}>
+              <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+                <span style={{ marginRight: '8px', color: '#ef4444' }}>•</span>
+                Missing Supabase database setup
+              </li>
+              <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+                <span style={{ marginRight: '8px', color: '#ef4444' }}>•</span>
+                Network connectivity issues
+              </li>
+              <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+                <span style={{ marginRight: '8px', color: '#ef4444' }}>•</span>
+                Configuration problems
+              </li>
             </ul>
             <div style={{
               background: 'rgba(255,255,255,0.2)',
