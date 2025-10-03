@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useMood } from '../contexts/MoodContext';
-import { Calendar, Search } from 'lucide-react';
+import { Calendar, Search, Loader } from 'lucide-react';
 
 const MoodHistory: React.FC = () => {
   const { moodEntries, loading } = useMood();
@@ -9,25 +9,41 @@ const MoodHistory: React.FC = () => {
   const [dateRange, setDateRange] = useState('all');
 
   const filteredEntries = useMemo(() => {
-    return moodEntries.filter(entry => {
-      const matchesSearch = entry.journal_entry?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           getMoodLabel(entry.mood_score).toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesMood = selectedMood === 'all' || getMoodLabel(entry.mood_score) === selectedMood;
-      
-      const entryDate = new Date(entry.date);
+    let filtered = moodEntries;
+
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(entry =>
+        entry.journal_entry?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        getMoodLabel(entry.mood_score).toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply mood filter
+    if (selectedMood !== 'all') {
+      filtered = filtered.filter(entry => getMoodLabel(entry.mood_score) === selectedMood);
+    }
+
+    // Apply date filter
+    if (dateRange !== 'all') {
       const now = new Date();
-      let matchesDate = true;
-      
+      let startDate: Date;
+
       if (dateRange === 'week') {
-        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        matchesDate = entryDate >= oneWeekAgo;
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       } else if (dateRange === 'month') {
-        const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-        matchesDate = entryDate >= oneMonthAgo;
+        startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      } else {
+        startDate = new Date(0); // Beginning of time
       }
-      
-      return matchesSearch && matchesMood && matchesDate;
-    });
+
+      filtered = filtered.filter(entry => {
+        const entryDate = new Date(entry.date);
+        return entryDate >= startDate;
+      });
+    }
+
+    return filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [moodEntries, searchTerm, selectedMood, dateRange]);
 
   const getMoodColor = (moodScore: number) => {
@@ -52,12 +68,22 @@ const MoodHistory: React.FC = () => {
     return emojiMap[moodScore] || '😐';
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   if (loading) {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <span className="ml-3 text-gray-600">Loading your mood history...</span>
+          <Loader className="animate-spin h-6 w-6 text-blue-500 mr-3" />
+          <span className="text-gray-600">Loading your mood history...</span>
         </div>
       </div>
     );
@@ -65,74 +91,77 @@ const MoodHistory: React.FC = () => {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-      {/* Header */}
+      {/* Header with Filters */}
       <div className="p-6 border-b border-gray-100">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
           <div>
             <h2 className="text-xl font-bold text-gray-800">Mood History</h2>
             <p className="text-gray-600 text-sm mt-1">
               {filteredEntries.length} {filteredEntries.length === 1 ? 'entry' : 'entries'} found
             </p>
           </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3">
-            {/* Search */}
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search entries..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-48"
-              />
-            </div>
-            
-            {/* Mood Filter */}
-            <select
-              value={selectedMood}
-              onChange={(e) => setSelectedMood(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm"
-            >
-              <option value="all">All Moods</option>
-              <option value="Terrible">😢 Terrible</option>
-              <option value="Poor">😔 Poor</option>
-              <option value="Okay">😐 Okay</option>
-              <option value="Good">😊 Good</option>
-              <option value="Excellent">🤩 Excellent</option>
-            </select>
-            
-            {/* Date Filter */}
-            <select
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm"
-            >
-              <option value="all">All Time</option>
-              <option value="week">Past Week</option>
-              <option value="month">Past Month</option>
-            </select>
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Search */}
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search entries..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm w-full"
+            />
           </div>
+
+          {/* Mood Filter */}
+          <select
+            value={selectedMood}
+            onChange={(e) => setSelectedMood(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm min-w-[140px]"
+          >
+            <option value="all">All Moods</option>
+            <option value="Terrible">😢 Terrible</option>
+            <option value="Poor">😔 Poor</option>
+            <option value="Okay">😐 Okay</option>
+            <option value="Good">😊 Good</option>
+            <option value="Excellent">🤩 Excellent</option>
+          </select>
+
+          {/* Date Filter */}
+          <select
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm min-w-[140px]"
+          >
+            <option value="all">All Time</option>
+            <option value="week">Past Week</option>
+            <option value="month">Past Month</option>
+          </select>
         </div>
       </div>
 
-      {/* Entries */}
+      {/* Entries List */}
       <div className="p-6">
         {filteredEntries.length === 0 ? (
           <div className="text-center py-12">
             <Calendar size={48} className="mx-auto text-gray-300 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">No entries found</h3>
+            <h3 className="text-lg font-semibold text-gray-600 mb-2">
+              {moodEntries.length === 0 ? "No entries yet" : "No entries match your filters"}
+            </h3>
             <p className="text-gray-500 max-w-sm mx-auto">
               {moodEntries.length === 0 
                 ? "Start tracking your mood to see your history here."
-                : "Try adjusting your filters to see more entries."}
+                : "Try adjusting your search or filters to see more entries."}
             </p>
           </div>
         ) : (
           <div className="space-y-4">
             {filteredEntries.map((entry) => (
               <div key={entry.id} className="border border-gray-200 rounded-xl p-4 hover:border-gray-300 transition-colors">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4 flex-1">
                     <span className="text-3xl flex-shrink-0">{getMoodEmoji(entry.mood_score)}</span>
                     <div className="flex-1 min-w-0">
@@ -147,19 +176,18 @@ const MoodHistory: React.FC = () => {
                         )}
                       </div>
                       {entry.journal_entry && (
-                        <p className="text-gray-700 leading-relaxed">{entry.journal_entry}</p>
+                        <p className="text-gray-700 leading-relaxed mb-2">{entry.journal_entry}</p>
                       )}
-                      <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
-                        <span>{new Date(entry.date).toLocaleDateString('en-US', { 
-                          weekday: 'short', 
-                          year: 'numeric', 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}</span>
-                        <span>{new Date(entry.created_at).toLocaleTimeString('en-US', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}</span>
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <span>{formatDate(entry.date)}</span>
+                        {entry.created_at && (
+                          <span>
+                            {new Date(entry.created_at).toLocaleTimeString('en-US', {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
