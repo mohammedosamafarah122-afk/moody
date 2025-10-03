@@ -57,14 +57,22 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
       '😔 sad': 2,
       '😡 angry': 1,
       '😴 tired': 2,
+      '😰 anxious': 2,
+      '🤩 excited': 5,
+      '😌 relaxed': 4,
       'happy': 5,
       'neutral': 3,
       'sad': 2,
       'angry': 1,
-      'tired': 2
+      'tired': 2,
+      'anxious': 2,
+      'excited': 5,
+      'relaxed': 4
     }
 
-    const mood_score = moodScoreMap[mood.toLowerCase()] || 3
+    // Extract mood label from emoji + label format
+    const moodLabel = mood.replace(/^[^\w\s]*\s*/, '').toLowerCase()
+    const mood_score = moodScoreMap[moodLabel] || 3
     const today = new Date().toISOString().split('T')[0]
 
     const moodData: CreateMoodEntryData = {

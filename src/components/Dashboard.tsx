@@ -7,6 +7,7 @@ import { CalendarHeatmap } from './CalendarHeatmap'
 import QuickActions from './QuickActions'
 import MoodHistory from './MoodHistory'
 import MoodReport from './MoodReport'
+import MoodModal from './MoodModal'
 import { StatsCards } from './StatsCards'
 import { LoadingSpinner } from './LoadingSpinner'
 import { ColorfulMoodIndicator, MoodTrendIndicator } from './ColorfulMoodIndicator'
@@ -17,6 +18,7 @@ export const Dashboard: React.FC = () => {
   const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isMoodModalOpen, setIsMoodModalOpen] = useState(false)
 
   useEffect(() => {
     loadMoodEntries()
@@ -138,9 +140,9 @@ export const Dashboard: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    <div className="animate-scale-in">
-                      <Link
-                        to="/log-mood"
+                    <div className="animate-scale-in flex space-x-3">
+                      <button
+                        onClick={() => setIsMoodModalOpen(true)}
                         className="btn-primary focus-ring hover:scale-105 transition-transform duration-200 shadow-lg"
                         style={{ 
                           background: 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #06B6D4 100%)',
@@ -150,7 +152,20 @@ export const Dashboard: React.FC = () => {
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
-                        Log Mood
+                        Quick Log
+                      </button>
+                      <Link
+                        to="/log-mood"
+                        className="btn-primary focus-ring hover:scale-105 transition-transform duration-200 shadow-lg"
+                        style={{ 
+                          background: 'linear-gradient(135deg, #10B981 0%, #F59E0B 100%)',
+                          boxShadow: '0 8px 25px rgba(16, 185, 129, 0.4), 0 4px 12px rgba(245, 158, 11, 0.3)'
+                        }}
+                      >
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Detailed Log
                       </Link>
                     </div>
                   </div>
@@ -462,6 +477,12 @@ export const Dashboard: React.FC = () => {
                 </div>
               )}
       </main>
+
+      {/* Mood Modal */}
+      <MoodModal 
+        isOpen={isMoodModalOpen} 
+        onClose={() => setIsMoodModalOpen(false)} 
+      />
     </div>
   )
 }
