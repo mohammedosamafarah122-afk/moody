@@ -1,16 +1,28 @@
 import React, { useState } from 'react';
 import { useMood } from '../contexts/MoodContext';
-import { X, Zap, Brain, Activity } from 'lucide-react';
+import { X, Zap, Brain, Activity, Smile, BookOpen } from 'lucide-react';
 
 interface MoodModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const EMOTIONS = [
+  'Happy', 'Sad', 'Angry', 'Anxious', 'Excited', 'Calm', 'Frustrated', 
+  'Grateful', 'Lonely', 'Confident', 'Overwhelmed', 'Peaceful', 'Energetic', 'Tired'
+]
+
+const ACTIVITIES = [
+  'Work', 'Exercise', 'Sleep', 'Socializing', 'Reading', 'Cooking', 'Gaming',
+  'Music', 'Art', 'Nature', 'Learning', 'Cleaning', 'Shopping', 'Travel', 'Meditation'
+]
+
 const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [notes, setNotes] = useState('');
   const [intensity, setIntensity] = useState(5);
+  const [emotions, setEmotions] = useState<string[]>([]);
+  const [activities, setActivities] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { addMoodEntry } = useMood();
@@ -23,6 +35,22 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
     { emoji: '😴', label: 'Tired', score: 2, color: 'purple-500', description: 'Reduced neural activity' },
   ];
 
+  const handleEmotionToggle = (emotion: string) => {
+    setEmotions(prev => 
+      prev.includes(emotion) 
+        ? prev.filter(e => e !== emotion)
+        : [...prev, emotion]
+    );
+  };
+
+  const handleActivityToggle = (activity: string) => {
+    setActivities(prev => 
+      prev.includes(activity) 
+        ? prev.filter(a => a !== activity)
+        : [...prev, activity]
+    );
+  };
+
   const handleSubmit = async () => {
     if (!selectedMood) {
       alert('Please select a mood');
@@ -32,17 +60,21 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
     setIsSubmitting(true);
     
     try {
-      console.log('Attempting to save mood:', { selectedMood, notes, intensity });
+      console.log('Attempting to save mood:', { selectedMood, notes, intensity, emotions, activities });
       await addMoodEntry(
         moodOptions.find(m => m.score === selectedMood)?.label || 'Unknown',
         notes,
-        intensity
+        intensity,
+        emotions,
+        activities
       );
       console.log('Save successful');
       
       setSelectedMood(null);
       setNotes('');
       setIntensity(5);
+      setEmotions([]);
+      setActivities([]);
       onClose();
       alert('✅ Mood saved successfully!');
     } catch (error: any) {
@@ -57,7 +89,7 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50">
-      <div className="cyber-modal max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="cyber-modal max-w-lg w-full max-h-[90vh] overflow-y-auto">
         {/* Cyberpunk Header */}
         <div className="flex justify-between items-center p-6 border-b border-cyber-border">
           <div className="flex items-center">
@@ -118,9 +150,60 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
+        {/* Emotions */}
+        <div className="p-6 border-t border-cyber-border">
+          <div className="flex items-center mb-3">
+            <Smile className="w-5 h-5 text-cyber-primary mr-2" />
+            <h3 className="cyber-label">Emotional Patterns (Optional)</h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {EMOTIONS.map((emotion) => (
+              <button
+                key={emotion}
+                type="button"
+                onClick={() => handleEmotionToggle(emotion)}
+                className={`cyber-badge ${
+                  emotions.includes(emotion)
+                    ? 'bg-cyber-primary bg-opacity-20 text-cyber-primary border-cyber-primary'
+                    : 'bg-cyber-border bg-opacity-20 text-cyber-text-muted border-cyber-border hover:border-cyber-primary'
+                }`}
+              >
+                {emotion}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Activities */}
+        <div className="p-6 border-t border-cyber-border">
+          <div className="flex items-center mb-3">
+            <Activity className="w-5 h-5 text-cyber-accent mr-2" />
+            <h3 className="cyber-label">Activity Patterns (Optional)</h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {ACTIVITIES.map((activity) => (
+              <button
+                key={activity}
+                type="button"
+                onClick={() => handleActivityToggle(activity)}
+                className={`cyber-badge ${
+                  activities.includes(activity)
+                    ? 'bg-cyber-accent bg-opacity-20 text-cyber-accent border-cyber-accent'
+                    : 'bg-cyber-border bg-opacity-20 text-cyber-text-muted border-cyber-border hover:border-cyber-accent'
+                }`}
+              >
+                {activity}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Notes */}
         <div className="p-6 border-t border-cyber-border">
-          <h3 className="cyber-label mb-3">Neural Notes (Optional)</h3>
+          <div className="flex items-center mb-3">
+            <BookOpen className="w-5 h-5 text-cyber-secondary mr-2" />
+            <h3 className="cyber-label">Neural Notes (Optional)</h3>
+          </div>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}

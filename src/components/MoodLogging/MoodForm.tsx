@@ -86,9 +86,9 @@ export const MoodForm: React.FC<MoodFormProps> = ({
 
     try {
       const moodString = `${MOOD_EMOJIS[formData.mood_score as keyof typeof MOOD_EMOJIS]} ${MOOD_LABELS[formData.mood_score as keyof typeof MOOD_LABELS]}`
-      const notes = `${formData.journal_entry} ${formData.emotions.map(e => `#${e}`).join(' ')} ${formData.activities.map(a => `#${a}`).join(' ')}`.trim()
+      const notes = formData.journal_entry
       
-      await addMoodEntry(moodString, notes, formData.intensity)
+      await addMoodEntry(moodString, notes, formData.intensity, formData.emotions, formData.activities)
       
       setSuccess(true)
       setFormData(prev => ({

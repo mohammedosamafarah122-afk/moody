@@ -28,7 +28,7 @@ interface MoodContextType {
   loading: boolean;
   stats: MoodStats;
   fetchMoodEntries: () => Promise<void>;
-  addMoodEntry: (mood: string, notes?: string, intensity?: number) => Promise<MoodEntry>;
+  addMoodEntry: (mood: string, notes?: string, intensity?: number, emotions?: string[], activities?: string[]) => Promise<MoodEntry>;
   updateMoodEntry: (id: string, updates: Partial<MoodEntry>) => Promise<void>;
   deleteMoodEntry: (id: string) => Promise<void>;
   getMoodEntryByDate: (date: string) => MoodEntry | null;
@@ -65,7 +65,7 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const addMoodEntry = useCallback(async (mood: string, notes?: string, intensity?: number) => {
+  const addMoodEntry = useCallback(async (mood: string, notes?: string, intensity?: number, emotions?: string[], activities?: string[]) => {
     try {
       console.log('Starting addMoodEntry...');
       
@@ -106,6 +106,8 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
         mood_score,
         journal_entry: notes || '',
         intensity: intensity || 5,
+        emotions: emotions || [],
+        activities: activities || [],
         updated_at: new Date().toISOString()
       };
 
