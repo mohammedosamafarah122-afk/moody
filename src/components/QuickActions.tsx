@@ -7,13 +7,43 @@ const QuickActions: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addMoodEntry } = useMood();
 
-  const handleQuickMood = async (_moodScore: number, moodLabel: string) => {
+  const handleQuickMood = async (moodScore: number, moodLabel: string) => {
     try {
-      await addMoodEntry(`${moodLabel}`, `Quick mood entry: ${moodLabel}`);
+      // Add some default emotions and activities based on mood
+      const defaultEmotions = getDefaultEmotions(moodLabel);
+      const defaultActivities = getDefaultActivities(moodLabel);
+      
+      await addMoodEntry(
+        `${moodLabel}`, 
+        `Quick mood entry: ${moodLabel}`, 
+        5, // default intensity
+        defaultEmotions,
+        defaultActivities
+      );
       alert('✅ Neural pattern recorded!');
     } catch (error) {
       alert('❌ Failed to record pattern');
     }
+  };
+
+  const getDefaultEmotions = (moodLabel: string): string[] => {
+    const emotionMap: Record<string, string[]> = {
+      'Happy': ['Happy', 'Excited', 'Grateful'],
+      'Neutral': ['Calm', 'Peaceful'],
+      'Sad': ['Sad', 'Lonely'],
+      'Angry': ['Angry', 'Frustrated']
+    };
+    return emotionMap[moodLabel] || [];
+  };
+
+  const getDefaultActivities = (moodLabel: string): string[] => {
+    const activityMap: Record<string, string[]> = {
+      'Happy': ['Socializing', 'Music', 'Exercise'],
+      'Neutral': ['Reading', 'Meditation'],
+      'Sad': ['Sleep', 'Music'],
+      'Angry': ['Exercise', 'Nature']
+    };
+    return activityMap[moodLabel] || [];
   };
 
   const quickMoods = [
