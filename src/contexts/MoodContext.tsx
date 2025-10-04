@@ -57,6 +57,7 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .order('date', { ascending: false });
 
       if (error) throw error;
+      console.log('Fetched mood entries:', data);
       setMoodEntries(data || []);
     } catch (error) {
       console.error('Error fetching mood entries:', error);
@@ -112,6 +113,8 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
 
       console.log('Saving data:', moodData);
+      console.log('Emotions array:', emotions);
+      console.log('Activities array:', activities);
 
       // Save to database
       const { data, error } = await supabase
@@ -129,6 +132,8 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log('Save successful:', data);
+      console.log('Saved emotions:', data.emotions);
+      console.log('Saved activities:', data.activities);
       
       // Refresh the entries
       await fetchMoodEntries();
