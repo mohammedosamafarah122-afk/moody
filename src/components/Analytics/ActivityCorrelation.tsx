@@ -7,17 +7,22 @@ interface ActivityCorrelationProps {
 }
 
 export const ActivityCorrelation: React.FC<ActivityCorrelationProps> = ({ entries }) => {
+  // Extract activities from hashtags in journal entries
+  const extractActivities = (journalEntry: string = '') => {
+    const activityMatches = journalEntry.match(/#(\w+)/g) || []
+    return activityMatches.map(match => match.substring(1)) // Remove # symbol
+  }
+
   // Calculate activity-mood correlations
   const activityCounts = entries.reduce((acc, entry) => {
-    if (entry.activities) {
-      entry.activities.forEach((activity: string) => {
-        if (!acc[activity]) {
-          acc[activity] = { totalMood: 0, count: 0 }
-        }
-        acc[activity].totalMood += entry.mood_score
-        acc[activity].count += 1
-      })
-    }
+    const activities = extractActivities(entry.journal_entry)
+    activities.forEach((activity: string) => {
+      if (!acc[activity]) {
+        acc[activity] = { totalMood: 0, count: 0 }
+      }
+      acc[activity].totalMood += entry.mood_score
+      acc[activity].count += 1
+    })
     return acc
   }, {} as Record<string, { totalMood: number; count: number }>)
 

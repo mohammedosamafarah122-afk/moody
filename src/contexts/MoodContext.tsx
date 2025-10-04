@@ -100,21 +100,24 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const moodLabel = mood.replace(/^[^\w\s]*\s*/, '').toLowerCase()
       const mood_score = moodScoreMap[moodLabel] || 3
 
-      // Prepare data
+      // Prepare data with hashtag patterns in journal entry
+      const emotionTags = emotions ? emotions.map(e => `#${e}`).join(' ') : '';
+      const activityTags = activities ? activities.map(a => `#${a}`).join(' ') : '';
+      const journalWithPatterns = [notes, emotionTags, activityTags].filter(Boolean).join(' ');
+
       const moodData = {
         user_id: user.id,
         date: today,
         mood_score,
-        journal_entry: notes || '',
+        journal_entry: journalWithPatterns,
         intensity: intensity || 5,
-        emotions: emotions || [],
-        activities: activities || [],
         updated_at: new Date().toISOString()
       };
 
       console.log('Saving data:', moodData);
       console.log('Emotions array:', emotions);
       console.log('Activities array:', activities);
+      console.log('Journal with patterns:', journalWithPatterns);
 
       // Save to database
       const { data, error } = await supabase
@@ -132,8 +135,7 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log('Save successful:', data);
-      console.log('Saved emotions:', data.emotions);
-      console.log('Saved activities:', data.activities);
+      console.log('Saved journal entry:', data.journal_entry);
       
       // Refresh the entries
       await fetchMoodEntries();

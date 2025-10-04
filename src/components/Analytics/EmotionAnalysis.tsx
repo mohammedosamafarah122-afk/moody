@@ -7,13 +7,18 @@ interface EmotionAnalysisProps {
 }
 
 export const EmotionAnalysis: React.FC<EmotionAnalysisProps> = ({ entries }) => {
+  // Extract emotions from hashtags in journal entries
+  const extractEmotions = (journalEntry: string = '') => {
+    const emotionMatches = journalEntry.match(/#(\w+)/g) || []
+    return emotionMatches.map(match => match.substring(1)) // Remove # symbol
+  }
+
   // Count emotion frequencies
   const emotionCounts = entries.reduce((acc, entry) => {
-    if (entry.emotions) {
-      entry.emotions.forEach((emotion: string) => {
-        acc[emotion] = (acc[emotion] || 0) + 1
-      })
-    }
+    const emotions = extractEmotions(entry.journal_entry)
+    emotions.forEach((emotion: string) => {
+      acc[emotion] = (acc[emotion] || 0) + 1
+    })
     return acc
   }, {} as Record<string, number>)
 
@@ -25,7 +30,7 @@ export const EmotionAnalysis: React.FC<EmotionAnalysisProps> = ({ entries }) => 
   // Calculate emotion-mood correlations
   const emotionMoodCorrelations = Object.keys(emotionCounts).map(emotion => {
     const entriesWithEmotion = entries.filter(entry => 
-      entry.emotions?.includes(emotion)
+      extractEmotions(entry.journal_entry).includes(emotion)
     )
     
     if (entriesWithEmotion.length === 0) return { emotion, avgMood: 0 }
