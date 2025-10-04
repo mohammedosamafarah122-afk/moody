@@ -1,57 +1,47 @@
 import React, { useEffect, useState } from 'react'
-import { format, subDays, subMonths } from 'date-fns'
-import { MoodService, type MoodEntry } from '../../services/moodService'
-import { BarChart3, TrendingUp, Calendar, Activity, Smile } from 'lucide-react'
+import { subDays, subMonths } from 'date-fns'
+import { useMood } from '../../contexts/MoodContext'
+import { BarChart3, TrendingUp, Calendar, Activity, Smile, Brain } from 'lucide-react'
 import { MoodTrendChart } from './MoodTrendChart'
 import { EmotionAnalysis } from './EmotionAnalysis'
 import { ActivityCorrelation } from './ActivityCorrelation'
+import { AIAssistant } from '../AIAssistant/AIAssistant'
 
 export const Analytics: React.FC = () => {
-  const [entries, setEntries] = useState<MoodEntry[]>([])
+  const { moodEntries, loading, fetchMoodEntries } = useMood()
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   useEffect(() => {
-    loadAnalyticsData()
-  }, [timeRange])
+    fetchMoodEntries()
+  }, [fetchMoodEntries])
 
-  const loadAnalyticsData = async () => {
-    setLoading(true)
-    setError('')
+  // Filter entries based on time range
+  const getFilteredEntries = () => {
+    const endDate = new Date()
+    let startDate: Date
 
-    try {
-      const endDate = format(new Date(), 'yyyy-MM-dd')
-      let startDate: string
-
-      switch (timeRange) {
-        case '7d':
-          startDate = format(subDays(new Date(), 7), 'yyyy-MM-dd')
-          break
-        case '30d':
-          startDate = format(subDays(new Date(), 30), 'yyyy-MM-dd')
-          break
-        case '90d':
-          startDate = format(subDays(new Date(), 90), 'yyyy-MM-dd')
-          break
-        case '1y':
-          startDate = format(subMonths(new Date(), 12), 'yyyy-MM-dd')
-          break
-      }
-
-      const { data, error } = await MoodService.getMoodEntriesInRange(startDate, endDate)
-
-      if (error) {
-        setError(error.message)
-      } else {
-        setEntries(data || [])
-      }
-    } catch (err) {
-      setError('Failed to load analytics data')
-    } finally {
-      setLoading(false)
+    switch (timeRange) {
+      case '7d':
+        startDate = subDays(new Date(), 7)
+        break
+      case '30d':
+        startDate = subDays(new Date(), 30)
+        break
+      case '90d':
+        startDate = subDays(new Date(), 90)
+        break
+      case '1y':
+        startDate = subMonths(new Date(), 12)
+        break
     }
+
+    return moodEntries.filter(entry => {
+      const entryDate = new Date(entry.date)
+      return entryDate >= startDate && entryDate <= endDate
+    })
   }
+
+  const entries = getFilteredEntries()
 
   const calculateAverageMood = () => {
     if (entries.length === 0) return 0
@@ -84,23 +74,10 @@ export const Analytics: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="card">
-        <div className="text-center text-red-600">
-          <p>Error loading analytics: {error}</p>
-          <button 
-            onClick={loadAnalyticsData}
-            className="btn-primary mt-4"
-          >
-            Try Again
-          </button>
+      <div className="cyber-dashboard flex items-center justify-center min-h-64">
+        <div className="cyber-card p-8 text-center">
+          <div className="cyber-spinner mx-auto mb-4"></div>
+          <p className="text-cyber-text-muted">Analyzing neural patterns...</p>
         </div>
       </div>
     )
@@ -110,123 +87,148 @@ export const Analytics: React.FC = () => {
   const moodTrend = getMoodTrend()
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <BarChart3 className="h-8 w-8 text-primary-600" />
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-            <p className="text-gray-600 mt-1">Insights into your mood patterns and trends</p>
+    <div className="cyber-dashboard py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Cyberpunk Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+          <div className="flex items-center space-x-3">
+            <BarChart3 className="h-10 w-10 text-cyber-primary" />
+            <div>
+              <h1 className="cyber-text text-4xl font-bold">Neural Analytics</h1>
+              <p className="text-cyber-text-muted text-sm mt-1">Advanced insights into your neural patterns and trends</p>
+            </div>
+          </div>
+
+          {/* Time Range Selector */}
+          <div className="flex items-center space-x-3">
+            <Calendar className="h-5 w-5 text-cyber-accent" />
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value as typeof timeRange)}
+              className="cyber-select"
+            >
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+              <option value="90d">Last 90 Days</option>
+              <option value="1y">Last Year</option>
+            </select>
           </div>
         </div>
 
-        {/* Time Range Selector */}
-        <div className="flex items-center space-x-2">
-          <Calendar className="h-4 w-4 text-gray-500" />
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value as typeof timeRange)}
-            className="input-field py-1 text-sm"
-          >
-            <option value="7d">Last 7 Days</option>
-            <option value="30d">Last 30 Days</option>
-            <option value="90d">Last 90 Days</option>
-            <option value="1y">Last Year</option>
-          </select>
-        </div>
+        {entries.length === 0 ? (
+          <div className="cyber-card text-center py-16">
+            <div className="relative mb-8">
+              <BarChart3 className="h-16 w-16 text-cyber-border mx-auto mb-4" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Brain className="w-8 h-8 text-cyber-primary animate-cyber-pulse" />
+              </div>
+            </div>
+            <h3 className="cyber-text text-2xl font-bold mb-4">No neural data available</h3>
+            <p className="text-cyber-text-muted mb-6 max-w-md mx-auto">
+              No mood entries found for {getTimeRangeLabel().toLowerCase()}. Start tracking your neural patterns to see analytics.
+            </p>
+            <a href="/log-mood" className="cyber-btn-primary">
+              <Brain className="w-5 h-5 mr-2" />
+              Log Neural Pattern
+            </a>
+          </div>
+        ) : (
+          <>
+            {/* Summary Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="cyber-stat-card">
+                <div className="flex items-center mb-4">
+                  <BarChart3 className="h-8 w-8 text-cyber-primary mr-3" />
+                  <div>
+                    <p className="text-cyber-text-muted text-sm font-medium uppercase tracking-wider">Average Mood</p>
+                    <p className="cyber-text text-3xl font-bold font-mono">{averageMood.toFixed(1)}</p>
+                    <p className="text-cyber-text-muted text-xs">{getTimeRangeLabel()}</p>
+                  </div>
+                </div>
+                <div className="cyber-progress h-2">
+                  <div 
+                    className="cyber-progress-bar" 
+                    style={{ width: `${(averageMood / 5) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              <div className="cyber-stat-card">
+                <div className="flex items-center mb-4">
+                  <TrendingUp className={`h-8 w-8 mr-3 ${
+                    moodTrend === 'improving' ? 'text-cyber-primary' :
+                    moodTrend === 'declining' ? 'text-cyber-secondary' :
+                    'text-cyber-accent'
+                  }`} />
+                  <div>
+                    <p className="text-cyber-text-muted text-sm font-medium uppercase tracking-wider">Trend</p>
+                    <p className="cyber-text text-3xl font-bold font-mono capitalize">{moodTrend}</p>
+                    <p className="text-cyber-text-muted text-xs">Overall direction</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${
+                    moodTrend === 'improving' ? 'bg-cyber-primary' :
+                    moodTrend === 'declining' ? 'bg-cyber-secondary' :
+                    'bg-cyber-accent'
+                  } animate-cyber-pulse`}></div>
+                  <span className="text-cyber-text-muted text-xs">Neural trajectory</span>
+                </div>
+              </div>
+
+              <div className="cyber-stat-card">
+                <div className="flex items-center mb-4">
+                  <Calendar className="h-8 w-8 text-cyber-accent mr-3" />
+                  <div>
+                    <p className="text-cyber-text-muted text-sm font-medium uppercase tracking-wider">Total Entries</p>
+                    <p className="cyber-text text-3xl font-bold font-mono">{entries.length}</p>
+                    <p className="text-cyber-text-muted text-xs">{getTimeRangeLabel()}</p>
+                  </div>
+                </div>
+                <div className="cyber-progress h-2">
+                  <div 
+                    className="cyber-progress-bar" 
+                    style={{ width: `${Math.min(100, (entries.length / 30) * 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              {/* Mood Trend Over Time */}
+              <div className="cyber-card p-6">
+                <div className="flex items-center space-x-3 mb-6">
+                  <TrendingUp className="h-6 w-6 text-cyber-primary" />
+                  <h3 className="cyber-text text-xl font-bold">Neural Trend Analysis</h3>
+                </div>
+                <MoodTrendChart entries={entries} />
+              </div>
+
+              {/* Emotion Analysis */}
+              <div className="cyber-card p-6">
+                <div className="flex items-center space-x-3 mb-6">
+                  <Smile className="h-6 w-6 text-cyber-accent" />
+                  <h3 className="cyber-text text-xl font-bold">Emotion Patterns</h3>
+                </div>
+                <EmotionAnalysis entries={entries} />
+              </div>
+            </div>
+
+            {/* Activity Correlation */}
+            <div className="cyber-card p-6">
+              <div className="flex items-center space-x-3 mb-6">
+                <Activity className="h-6 w-6 text-cyber-secondary" />
+                <h3 className="cyber-text text-xl font-bold">Activity Impact on Neural Patterns</h3>
+              </div>
+              <ActivityCorrelation entries={entries} />
+            </div>
+          </>
+        )}
       </div>
-
-      {entries.length === 0 ? (
-        <div className="card text-center py-12">
-          <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No data available</h3>
-          <p className="text-gray-600 mb-4">
-            No mood entries found for {getTimeRangeLabel().toLowerCase()}
-          </p>
-          <a href="/log-mood" className="btn-primary">
-            Log Your Mood
-          </a>
-        </div>
-      ) : (
-        <>
-          {/* Summary Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="card">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-blue-50 text-blue-600">
-                  <BarChart3 className="h-6 w-6" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Average Mood</p>
-                  <p className="text-2xl font-bold text-gray-900">{averageMood.toFixed(1)}</p>
-                  <p className="text-sm text-gray-500">{getTimeRangeLabel()}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="flex items-center">
-                <div className={`p-3 rounded-full ${
-                  moodTrend === 'improving' ? 'bg-green-50 text-green-600' :
-                  moodTrend === 'declining' ? 'bg-red-50 text-red-600' :
-                  'bg-gray-50 text-gray-600'
-                }`}>
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Trend</p>
-                  <p className="text-2xl font-bold text-gray-900 capitalize">{moodTrend}</p>
-                  <p className="text-sm text-gray-500">Overall direction</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-purple-50 text-purple-600">
-                  <Calendar className="h-6 w-6" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Entries</p>
-                  <p className="text-2xl font-bold text-gray-900">{entries.length}</p>
-                  <p className="text-sm text-gray-500">{getTimeRangeLabel()}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Mood Trend Over Time */}
-            <div className="card">
-              <div className="flex items-center space-x-2 mb-4">
-                <TrendingUp className="h-5 w-5 text-primary-600" />
-                <h3 className="text-lg font-semibold text-gray-900">Mood Trend</h3>
-              </div>
-              <MoodTrendChart entries={entries} />
-            </div>
-
-            {/* Emotion Analysis */}
-            <div className="card">
-              <div className="flex items-center space-x-2 mb-4">
-                <Smile className="h-5 w-5 text-primary-600" />
-                <h3 className="text-lg font-semibold text-gray-900">Emotion Patterns</h3>
-              </div>
-              <EmotionAnalysis entries={entries} />
-            </div>
-          </div>
-
-          {/* Activity Correlation */}
-          <div className="card">
-            <div className="flex items-center space-x-2 mb-4">
-              <Activity className="h-5 w-5 text-primary-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Activity Impact on Mood</h3>
-            </div>
-            <ActivityCorrelation entries={entries} />
-          </div>
-        </>
-      )}
+      
+      {/* AI Assistant */}
+      <AIAssistant />
     </div>
   )
 }

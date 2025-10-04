@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useMood } from '../contexts/MoodContext';
-import { Calendar, Search, Loader } from 'lucide-react';
+import { Calendar, Search, Brain, Filter, Clock, Zap, Activity } from 'lucide-react';
 
 const MoodHistory: React.FC = () => {
   const { moodEntries, loading, fetchMoodEntries } = useMood();
@@ -53,13 +53,13 @@ const MoodHistory: React.FC = () => {
 
   const getMoodColor = (moodScore: number) => {
     const colorMap: { [key: number]: string } = {
-      1: 'bg-red-100 text-red-800 border-red-200',
-      2: 'bg-orange-100 text-orange-800 border-orange-200',
-      3: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      4: 'bg-green-100 text-green-800 border-green-200',
-      5: 'bg-blue-100 text-blue-800 border-blue-200',
+      1: 'bg-red-500 bg-opacity-20 text-red-400 border-red-500',
+      2: 'bg-orange-500 bg-opacity-20 text-orange-400 border-orange-500',
+      3: 'bg-yellow-500 bg-opacity-20 text-yellow-400 border-yellow-500',
+      4: 'bg-cyber-primary bg-opacity-20 text-cyber-primary border-cyber-primary',
+      5: 'bg-cyber-accent bg-opacity-20 text-cyber-accent border-cyber-accent',
     };
-    return colorMap[moodScore] || 'bg-gray-100 text-gray-800 border-gray-200';
+    return colorMap[moodScore] || 'bg-cyber-border bg-opacity-20 text-cyber-text-muted border-cyber-border';
   };
 
   const getMoodEmoji = (moodScore: number) => {
@@ -85,66 +85,75 @@ const MoodHistory: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <div className="cyber-card p-8">
         <div className="flex items-center justify-center">
-          <Loader className="animate-spin h-6 w-6 text-blue-500 mr-3" />
-          <span className="text-gray-600">Loading your mood history...</span>
+          <div className="cyber-spinner mr-4"></div>
+          <span className="text-cyber-text-muted">Loading neural patterns...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-      {/* Header with Filters */}
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">Mood History</h2>
-            <p className="text-gray-600 text-sm mt-1">
-              {filteredEntries.length} {filteredEntries.length === 1 ? 'entry' : 'entries'} found
-            </p>
+    <div className="cyber-card">
+      {/* Cyberpunk Header */}
+      <div className="p-6 border-b border-cyber-border">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+          <div className="flex items-center">
+            <Brain className="w-8 h-8 text-cyber-primary mr-3" />
+            <div>
+              <h2 className="cyber-text text-2xl font-bold">Neural History</h2>
+              <p className="text-cyber-text-muted text-sm mt-1">
+                {filteredEntries.length} {filteredEntries.length === 1 ? 'pattern' : 'patterns'} detected
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        {/* Cyberpunk Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search */}
-          <div className="relative flex-1">
-            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyber-text-muted" />
             <input
               type="text"
-              placeholder="Search entries..."
+              placeholder="Search neural patterns..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm w-full"
+              className="cyber-input pl-10 w-full"
             />
           </div>
 
           {/* Mood Filter */}
-          <select
-            value={selectedMood}
-            onChange={(e) => setSelectedMood(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm min-w-[140px]"
-          >
-            <option value="all">All Moods</option>
-            <option value="Terrible">😢 Terrible</option>
-            <option value="Poor">😔 Poor</option>
-            <option value="Okay">😐 Okay</option>
-            <option value="Good">😊 Good</option>
-            <option value="Excellent">🤩 Excellent</option>
-          </select>
+          <div className="relative">
+            <Filter size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyber-text-muted" />
+            <select
+              value={selectedMood}
+              onChange={(e) => setSelectedMood(e.target.value)}
+              className="cyber-select pl-10 w-full"
+            >
+              <option value="all">All Patterns</option>
+              <option value="Terrible">😢 Terrible</option>
+              <option value="Poor">😔 Poor</option>
+              <option value="Okay">😐 Okay</option>
+              <option value="Good">😊 Good</option>
+              <option value="Excellent">🤩 Excellent</option>
+            </select>
+          </div>
 
           {/* Date Filter */}
-          <select
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm min-w-[140px]"
-          >
-            <option value="all">All Time</option>
-            <option value="week">Past Week</option>
-            <option value="month">Past Month</option>
-          </select>
+          <div className="relative">
+            <Calendar size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyber-text-muted" />
+            <select
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+              className="cyber-select pl-10 w-full"
+            >
+              <option value="all">All Time</option>
+              <option value="week">Past Week</option>
+              <option value="month">Past Month</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -152,49 +161,106 @@ const MoodHistory: React.FC = () => {
       <div className="p-6">
         {filteredEntries.length === 0 ? (
           <div className="text-center py-12">
-            <Calendar size={48} className="mx-auto text-gray-300 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">
-              {moodEntries.length === 0 ? "No entries yet" : "No entries match your filters"}
+            <div className="relative mb-6">
+              <Calendar size={64} className="mx-auto text-cyber-border mb-4" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Brain className="w-8 h-8 text-cyber-primary animate-cyber-pulse" />
+              </div>
+            </div>
+            <h3 className="cyber-text text-xl font-bold mb-2">
+              {moodEntries.length === 0 ? "No neural patterns detected" : "No patterns match your filters"}
             </h3>
-            <p className="text-gray-500 max-w-sm mx-auto">
+            <p className="text-cyber-text-muted max-w-sm mx-auto">
               {moodEntries.length === 0 
-                ? "Start tracking your mood to see your history here."
-                : "Try adjusting your search or filters to see more entries."}
+                ? "Begin recording your neural patterns to see your history here."
+                : "Try adjusting your search or filters to see more patterns."}
             </p>
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredEntries.map((entry) => (
-              <div key={entry.id} className="border border-gray-200 rounded-xl p-4 hover:border-gray-300 transition-colors">
+            {filteredEntries.map((entry, index) => (
+              <div 
+                key={entry.id} 
+                className="cyber-card p-6 hover:scale-[1.02] transition-all duration-300 group"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4 flex-1">
-                    <span className="text-3xl flex-shrink-0">{getMoodEmoji(entry.mood_score)}</span>
+                    {/* Mood Emoji */}
+                    <div className="relative">
+                      <span className="text-4xl flex-shrink-0 group-hover:animate-cyber-float">
+                        {getMoodEmoji(entry.mood_score)}
+                      </span>
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyber-primary rounded-full animate-cyber-pulse"></div>
+                    </div>
+
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getMoodColor(entry.mood_score)}`}>
+                      {/* Mood Badge and Intensity */}
+                      <div className="flex flex-wrap items-center gap-3 mb-3">
+                        <span className={`cyber-badge ${getMoodColor(entry.mood_score)}`}>
                           {getMoodLabel(entry.mood_score)} ({entry.mood_score}/5)
                         </span>
                         {entry.intensity && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium">
-                            Intensity: {entry.intensity}/10
-                          </span>
+                          <div className="flex items-center space-x-2">
+                            <Zap className="w-4 h-4 text-cyber-accent" />
+                            <span className="text-cyber-accent text-sm font-mono">
+                              {entry.intensity}/10
+                            </span>
+                          </div>
                         )}
                       </div>
+
+                      {/* Journal Entry */}
                       {entry.journal_entry && (
-                        <p className="text-gray-700 leading-relaxed mb-2">{entry.journal_entry}</p>
+                        <div className="mb-4">
+                          <p className="text-cyber-text leading-relaxed bg-cyber-surface p-3 rounded-lg border border-cyber-border">
+                            {entry.journal_entry}
+                          </p>
+                        </div>
                       )}
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span>{formatDate(entry.date)}</span>
+
+                      {/* Date and Time */}
+                      <div className="flex items-center gap-4 text-sm text-cyber-text-muted">
+                        <div className="flex items-center">
+                          <Calendar className="w-4 h-4 mr-2" />
+                          <span>{formatDate(entry.date)}</span>
+                        </div>
                         {entry.created_at && (
-                          <span>
-                            {new Date(entry.created_at).toLocaleTimeString('en-US', {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </span>
+                          <div className="flex items-center">
+                            <Clock className="w-4 h-4 mr-2" />
+                            <span>
+                              {new Date(entry.created_at).toLocaleTimeString('en-US', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
                         )}
                       </div>
                     </div>
+                  </div>
+
+                  {/* Status Indicator */}
+                  <div className="flex flex-col items-end space-y-2">
+                    <div className="flex items-center">
+                      <Activity className="w-4 h-4 text-cyber-primary mr-2" />
+                      <span className="text-cyber-primary text-xs font-mono">RECORDED</span>
+                    </div>
+                    <div className="w-2 h-2 bg-cyber-primary rounded-full animate-cyber-pulse"></div>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mt-4">
+                  <div className="flex justify-between text-xs text-cyber-text-muted mb-1">
+                    <span>Neural Intensity</span>
+                    <span>{entry.mood_score}/5</span>
+                  </div>
+                  <div className="cyber-progress h-2">
+                    <div 
+                      className="cyber-progress-bar" 
+                      style={{ width: `${(entry.mood_score / 5) * 100}%` }}
+                    ></div>
                   </div>
                 </div>
               </div>

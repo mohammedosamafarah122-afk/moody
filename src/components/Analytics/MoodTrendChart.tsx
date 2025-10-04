@@ -1,7 +1,10 @@
 import React from 'react'
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import { format, parseISO } from 'date-fns'
-import type { MoodEntry } from '../../services/moodService'
+import type { MoodEntry } from '../../contexts/MoodContext'
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend)
 
 interface MoodTrendChartProps {
   entries: MoodEntry[]

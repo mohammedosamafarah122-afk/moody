@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useMood } from '../contexts/MoodContext';
-import { Download, TrendingUp, TrendingDown, Minus, BarChart3 } from 'lucide-react';
+import { Download, TrendingUp, TrendingDown, Minus, BarChart3, Brain, Zap, Activity, Target, Calendar } from 'lucide-react';
 
 const MoodReport: React.FC = () => {
   const { moodEntries, loading } = useMood();
@@ -128,33 +128,33 @@ const MoodReport: React.FC = () => {
 
   const downloadReport = () => {
     const reportData = `
-MOODY - MOOD TRACKING REPORT
+MOODY - NEURAL PATTERN ANALYSIS REPORT
 Generated on: ${new Date().toLocaleDateString()}
 Time Range: ${dateRange === 'all' ? 'All Time' : dateRange === 'week' ? 'Past Week' : 'Past Month'}
 
-SUMMARY:
-• Total Entries: ${report.totalEntries}
-• Most Common Mood: ${report.mostCommonMood}
-• Average Mood Score: ${report.averageMoodScore}/5
+NEURAL SUMMARY:
+• Total Patterns: ${report.totalEntries}
+• Most Common Pattern: ${report.mostCommonMood}
+• Average Neural Score: ${report.averageMoodScore}/5
 • Average Intensity: ${report.averageIntensity}/10
 • Current Streak: ${report.streak} days
 • Trend: ${report.trend}
 
-MOOD DISTRIBUTION:
+PATTERN DISTRIBUTION:
 ${Object.entries(report.moodDistribution)
-  .map(([mood, count]) => `  ${mood}: ${count} entries (${Math.round((count / report.totalEntries) * 100)}%)`)
+  .map(([mood, count]) => `  ${mood}: ${count} patterns (${Math.round((count / report.totalEntries) * 100)}%)`)
   .join('\n')}
 
-${report.insights.length > 0 ? `INSIGHTS:\n${report.insights.map(insight => `• ${insight}`).join('\n')}` : ''}
+${report.insights.length > 0 ? `NEURAL INSIGHTS:\n${report.insights.map(insight => `• ${insight}`).join('\n')}` : ''}
 
-Thank you for using Moody to track your emotional well-being!
+Thank you for using Moody to track your neural patterns!
     `.trim();
 
     const blob = new Blob([reportData], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `mood-report-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `neural-report-${new Date().toISOString().split('T')[0]}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -163,9 +163,9 @@ Thank you for using Moody to track your emotional well-being!
 
   const getTrendIcon = () => {
     switch (report.trend) {
-      case 'improving': return <TrendingUp size={20} className="text-green-500" />;
-      case 'declining': return <TrendingDown size={20} className="text-red-500" />;
-      default: return <Minus size={20} className="text-yellow-500" />;
+      case 'improving': return <TrendingUp size={20} className="text-cyber-primary" />;
+      case 'declining': return <TrendingDown size={20} className="text-cyber-secondary" />;
+      default: return <Minus size={20} className="text-cyber-accent" />;
     }
   };
 
@@ -182,43 +182,49 @@ Thank you for using Moody to track your emotional well-being!
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <div className="cyber-card p-8">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mr-3"></div>
-          <span className="text-gray-600">Generating your report...</span>
+          <div className="cyber-spinner mr-4"></div>
+          <span className="text-cyber-text-muted">Analyzing neural patterns...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-      {/* Header */}
-      <div className="p-6 border-b border-gray-100">
+    <div className="cyber-card">
+      {/* Cyberpunk Header */}
+      <div className="p-6 border-b border-cyber-border">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">Mood Analytics</h2>
-            <p className="text-gray-600 text-sm mt-1">Insights from your mood tracking journey</p>
+          <div className="flex items-center">
+            <BarChart3 className="w-8 h-8 text-cyber-primary mr-3" />
+            <div>
+              <h2 className="cyber-text text-2xl font-bold">Neural Analytics</h2>
+              <p className="text-cyber-text-muted text-sm mt-1">Insights from your neural pattern journey</p>
+            </div>
           </div>
           
-          <div className="flex gap-3">
-            <select
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value as any)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm"
-            >
-              <option value="all">All Time</option>
-              <option value="month">Past Month</option>
-              <option value="week">Past Week</option>
-            </select>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative">
+              <Calendar size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyber-text-muted" />
+              <select
+                value={dateRange}
+                onChange={(e) => setDateRange(e.target.value as any)}
+                className="cyber-select pl-10"
+              >
+                <option value="all">All Time</option>
+                <option value="month">Past Month</option>
+                <option value="week">Past Week</option>
+              </select>
+            </div>
             
             <button
               onClick={downloadReport}
               disabled={report.totalEntries === 0}
-              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+              className="cyber-btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Download size={16} />
-              Export
+              Export Data
             </button>
           </div>
         </div>
@@ -228,51 +234,74 @@ Thank you for using Moody to track your emotional well-being!
       <div className="p-6">
         {report.totalEntries === 0 ? (
           <div className="text-center py-12">
-            <BarChart3 size={48} className="mx-auto text-gray-300 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">No data available</h3>
-            <p className="text-gray-500">Start tracking your mood to generate reports.</p>
+            <div className="relative mb-6">
+              <BarChart3 size={64} className="mx-auto text-cyber-border mb-4" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Brain className="w-8 h-8 text-cyber-primary animate-cyber-pulse" />
+              </div>
+            </div>
+            <h3 className="cyber-text text-xl font-bold mb-2">No neural data available</h3>
+            <p className="text-cyber-text-muted">Start tracking your neural patterns to generate reports.</p>
           </div>
         ) : (
           <>
             {/* Key Metrics */}
-            <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
-              <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                <h3 className="text-sm font-medium text-blue-800 mb-1">Total Entries</h3>
-                <p className="text-2xl font-bold text-blue-600">{report.totalEntries}</p>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              <div className="cyber-stat-card">
+                <div className="flex items-center mb-3">
+                  <Brain className="w-6 h-6 text-cyber-primary mr-2" />
+                  <h3 className="text-cyber-text-muted text-sm font-medium uppercase tracking-wider">Total Patterns</h3>
+                </div>
+                <p className="cyber-text text-3xl font-bold font-mono">{report.totalEntries}</p>
               </div>
               
-              <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-                <h3 className="text-sm font-medium text-green-800 mb-1">Common Mood</h3>
+              <div className="cyber-stat-card">
+                <div className="flex items-center mb-3">
+                  <Activity className="w-6 h-6 text-cyber-accent mr-2" />
+                  <h3 className="text-cyber-text-muted text-sm font-medium uppercase tracking-wider">Common Pattern</h3>
+                </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">{getMoodEmoji(report.mostCommonMood)}</span>
-                  <p className="text-sm font-bold text-green-600 truncate" title={report.mostCommonMood}>
+                  <span className="text-2xl">{getMoodEmoji(report.mostCommonMood)}</span>
+                  <p className="cyber-text text-lg font-bold truncate" title={report.mostCommonMood}>
                     {report.mostCommonMood}
                   </p>
                 </div>
               </div>
               
-              <div className="bg-purple-50 p-4 rounded-xl border border-purple-100">
-                <h3 className="text-sm font-medium text-purple-800 mb-1">Avg Mood</h3>
-                <p className="text-2xl font-bold text-purple-600">{report.averageMoodScore}/5</p>
+              <div className="cyber-stat-card">
+                <div className="flex items-center mb-3">
+                  <Target className="w-6 h-6 text-cyber-secondary mr-2" />
+                  <h3 className="text-cyber-text-muted text-sm font-medium uppercase tracking-wider">Avg Score</h3>
+                </div>
+                <p className="cyber-text text-3xl font-bold font-mono">{report.averageMoodScore}/5</p>
               </div>
               
-              <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-                <h3 className="text-sm font-medium text-indigo-800 mb-1">Avg Intensity</h3>
-                <p className="text-2xl font-bold text-indigo-600">{report.averageIntensity}/10</p>
+              <div className="cyber-stat-card">
+                <div className="flex items-center mb-3">
+                  <Zap className="w-6 h-6 text-cyber-accent mr-2" />
+                  <h3 className="text-cyber-text-muted text-sm font-medium uppercase tracking-wider">Avg Intensity</h3>
+                </div>
+                <p className="cyber-text text-3xl font-bold font-mono">{report.averageIntensity}/10</p>
               </div>
 
-              <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
-                <h3 className="text-sm font-medium text-orange-800 mb-1">Current Streak</h3>
-                <p className="text-2xl font-bold text-orange-600">{report.streak} days</p>
+              <div className="cyber-stat-card">
+                <div className="flex items-center mb-3">
+                  <Calendar className="w-6 h-6 text-cyber-primary mr-2" />
+                  <h3 className="text-cyber-text-muted text-sm font-medium uppercase tracking-wider">Current Streak</h3>
+                </div>
+                <p className="cyber-text text-3xl font-bold font-mono">{report.streak} days</p>
               </div>
               
-              <div className="bg-teal-50 p-4 rounded-xl border border-teal-100">
-                <h3 className="text-sm font-medium text-teal-800 mb-1">Trend</h3>
+              <div className="cyber-stat-card">
+                <div className="flex items-center mb-3">
+                  <TrendingUp className="w-6 h-6 text-cyber-accent mr-2" />
+                  <h3 className="text-cyber-text-muted text-sm font-medium uppercase tracking-wider">Trend</h3>
+                </div>
                 <div className="flex items-center gap-2">
                   {getTrendIcon()}
-                  <span className={`text-sm font-bold capitalize ${
-                    report.trend === 'improving' ? 'text-green-600' : 
-                    report.trend === 'declining' ? 'text-red-600' : 'text-yellow-600'
+                  <span className={`text-sm font-bold capitalize font-mono ${
+                    report.trend === 'improving' ? 'text-cyber-primary' : 
+                    report.trend === 'declining' ? 'text-cyber-secondary' : 'text-cyber-accent'
                   }`}>
                     {report.trend}
                   </span>
@@ -281,9 +310,12 @@ Thank you for using Moody to track your emotional well-being!
             </div>
 
             {/* Mood Distribution Chart */}
-            <div className="bg-gray-50 p-6 rounded-2xl mb-6">
-              <h3 className="font-semibold text-gray-800 mb-4">Mood Distribution</h3>
-              <div className="space-y-3">
+            <div className="cyber-card p-6 mb-6">
+              <h3 className="cyber-text text-lg font-bold mb-4 flex items-center">
+                <BarChart3 className="w-5 h-5 mr-2" />
+                Pattern Distribution
+              </h3>
+              <div className="space-y-4">
                 {Object.entries(report.moodDistribution)
                   .sort(([,a], [,b]) => b - a)
                   .map(([mood, count]) => {
@@ -292,17 +324,20 @@ Thank you for using Moody to track your emotional well-being!
                       <div key={mood} className="flex items-center justify-between">
                         <div className="flex items-center space-x-3 flex-1">
                           <span className="text-2xl">{getMoodEmoji(mood)}</span>
-                          <span className="text-sm font-medium text-gray-700 flex-1">{mood}</span>
-                          <span className="text-sm text-gray-500 w-12 text-right">{count}</span>
+                          <span className="text-cyber-text font-medium flex-1">{mood}</span>
+                          <span className="text-cyber-text-muted text-sm w-12 text-right font-mono">{count}</span>
                         </div>
                         <div className="w-32">
-                          <div className="bg-gray-200 rounded-full h-3">
+                          <div className="cyber-progress h-3">
                             <div 
-                              className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all"
+                              className="cyber-progress-bar" 
                               style={{ width: `${percentage}%` }}
                             ></div>
                           </div>
                         </div>
+                        <span className="text-cyber-accent text-sm font-mono w-12 text-right">
+                          {Math.round(percentage)}%
+                        </span>
                       </div>
                     );
                   })}
@@ -311,16 +346,19 @@ Thank you for using Moody to track your emotional well-being!
 
             {/* Insights */}
             {report.insights.length > 0 && (
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl border border-blue-100">
-                <h3 className="font-semibold text-gray-800 mb-3">Personal Insights</h3>
-                <ul className="space-y-2" style={{ listStyle: 'none', padding: 0 }}>
+              <div className="cyber-card p-6">
+                <h3 className="cyber-text text-lg font-bold mb-4 flex items-center">
+                  <Brain className="w-5 h-5 mr-2" />
+                  Neural Insights
+                </h3>
+                <div className="space-y-3">
                   {report.insights.map((insight, index) => (
-                    <li key={index} className="flex items-start space-x-3" style={{ marginBottom: '8px' }}>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" style={{ marginRight: '8px' }}></div>
-                      <p className="text-gray-700">{insight}</p>
-                    </li>
+                    <div key={index} className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-cyber-primary rounded-full mt-2 flex-shrink-0 animate-cyber-pulse"></div>
+                      <p className="text-cyber-text">{insight}</p>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             )}
           </>

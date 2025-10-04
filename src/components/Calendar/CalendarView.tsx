@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths } from 'date-fns'
-import { MoodService, type MoodEntry } from '../../services/moodService'
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react'
+import { useMood } from '../../contexts/MoodContext'
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Brain } from 'lucide-react'
 import { MoodEntryModal } from './MoodEntryModal'
+import { AIAssistant } from '../AIAssistant/AIAssistant'
 
 const MOOD_EMOJIS = {
   1: '😢',
@@ -13,38 +14,14 @@ const MOOD_EMOJIS = {
 }
 
 export const CalendarView: React.FC = () => {
+  const { moodEntries, loading, fetchMoodEntries } = useMood()
   const [currentDate, setCurrentDate] = useState(new Date())
-  const [entries, setEntries] = useState<MoodEntry[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [selectedEntry, setSelectedEntry] = useState<MoodEntry | null>(null)
+  const [selectedEntry, setSelectedEntry] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
-    loadMonthEntries()
-  }, [currentDate])
-
-  const loadMonthEntries = async () => {
-    setLoading(true)
-    setError('')
-
-    try {
-      const monthStart = format(startOfMonth(currentDate), 'yyyy-MM-dd')
-      const monthEnd = format(endOfMonth(currentDate), 'yyyy-MM-dd')
-
-      const { data, error } = await MoodService.getMoodEntriesInRange(monthStart, monthEnd)
-
-      if (error) {
-        setError(error.message)
-      } else {
-        setEntries(data || [])
-      }
-    } catch (err) {
-      setError('Failed to load calendar data')
-    } finally {
-      setLoading(false)
-    }
-  }
+    fetchMoodEntries()
+  }, [fetchMoodEntries])
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     setCurrentDate(prev => 
@@ -52,8 +29,8 @@ export const CalendarView: React.FC = () => {
     )
   }
 
-  const getEntryForDate = (date: Date): MoodEntry | undefined => {
-    return Array.isArray(entries) ? entries.find(entry => isSameDay(new Date(entry.date), date)) : undefined
+  const getEntryForDate = (date: Date) => {
+    return moodEntries.find(entry => isSameDay(new Date(entry.date), date))
   }
 
   const handleDayClick = (date: Date) => {
@@ -87,121 +64,141 @@ export const CalendarView: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+      <div className="cyber-dashboard flex items-center justify-center min-h-64">
+        <div className="cyber-card p-8 text-center">
+          <div className="cyber-spinner mx-auto mb-4"></div>
+          <p className="text-cyber-text-muted">Loading neural calendar...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <CalendarIcon className="h-8 w-8 text-primary-600" />
-          <h1 className="text-3xl font-bold text-gray-900">Calendar</h1>
-        </div>
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => navigateMonth('prev')}
-            className="p-2 hover:bg-gray-100 rounded-md transition-colors"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <h2 className="text-xl font-semibold text-gray-900 min-w-48 text-center">
-            {format(currentDate, 'MMMM yyyy')}
-          </h2>
-          <button
-            onClick={() => navigateMonth('next')}
-            className="p-2 hover:bg-gray-100 rounded-md transition-colors"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-          {error}
-        </div>
-      )}
-
-      {/* Calendar Grid */}
-      <div className="card">
-        {/* Week Headers */}
-        <div className="grid grid-cols-7 gap-1 mb-4">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center text-sm font-medium text-gray-600 py-2">
-              {day}
+    <div className="cyber-dashboard py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Cyberpunk Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+          <div className="flex items-center space-x-3">
+            <CalendarIcon className="h-10 w-10 text-cyber-primary" />
+            <div>
+              <h1 className="cyber-text text-4xl font-bold">Neural Calendar</h1>
+              <p className="text-cyber-text-muted text-sm mt-1">Track your neural patterns over time</p>
             </div>
-          ))}
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => navigateMonth('prev')}
+              className="cyber-btn-secondary p-3 hover:scale-105 transition-all duration-300"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <h2 className="cyber-text text-2xl font-bold min-w-48 text-center font-mono">
+              {format(currentDate, 'MMMM yyyy')}
+            </h2>
+            <button
+              onClick={() => navigateMonth('next')}
+              className="cyber-btn-secondary p-3 hover:scale-105 transition-all duration-300"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
-        {/* Calendar Days */}
-        <div className="grid grid-cols-7 gap-1">
-          {allDays.map((date, index) => {
-            const entry = getEntryForDate(date)
-            const isCurrentMonth = isSameMonth(date, currentDate)
-            const isToday = isSameDay(date, new Date())
-            const hasEntry = !!entry
-
-            return (
-              <div
-                key={index}
-                onClick={() => isCurrentMonth && handleDayClick(date)}
-                className={`
-                  aspect-square p-2 border border-gray-200 rounded-lg transition-all cursor-pointer
-                  ${isCurrentMonth ? 'hover:bg-gray-50' : 'bg-gray-50 text-gray-400'}
-                  ${isToday ? 'ring-2 ring-primary-500 ring-offset-1' : ''}
-                  ${hasEntry ? 'bg-gradient-to-br from-white to-gray-50' : ''}
-                `}
-              >
-                <div className="h-full flex flex-col items-center justify-between">
-                  <span className={`text-sm font-medium ${isToday ? 'text-primary-600' : ''}`}>
-                    {format(date, 'd')}
-                  </span>
-                  
-                  {hasEntry && (
-                    <div className="flex flex-col items-center space-y-1">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold mood-${entry.mood_score}`}>
-                        <span>{MOOD_EMOJIS[entry.mood_score as keyof typeof MOOD_EMOJIS]}</span>
-                      </div>
-                      <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
-                    </div>
-                  )}
-                </div>
+        {/* Calendar Grid */}
+        <div className="cyber-card p-6">
+          {/* Week Headers */}
+          <div className="grid grid-cols-7 gap-2 mb-6">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="text-center text-sm font-medium text-cyber-text-muted py-3 font-mono">
+                {day}
               </div>
-            )
-          })}
-        </div>
+            ))}
+          </div>
 
-        {/* Legend */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <div className="flex items-center justify-center space-x-6 text-sm text-gray-600">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-primary-400 rounded-full"></div>
-              <span>Has mood entry</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 border-2 border-primary-500 rounded-full"></div>
-              <span>Today</span>
+          {/* Calendar Days */}
+          <div className="grid grid-cols-7 gap-2">
+            {allDays.map((date, index) => {
+              const entry = getEntryForDate(date)
+              const isCurrentMonth = isSameMonth(date, currentDate)
+              const isToday = isSameDay(date, new Date())
+              const hasEntry = !!entry
+
+              return (
+                <div
+                  key={index}
+                  onClick={() => isCurrentMonth && handleDayClick(date)}
+                  className={`
+                    aspect-square p-2 border border-cyber-border rounded-lg transition-all cursor-pointer
+                    ${isCurrentMonth ? 'hover:border-cyber-primary hover:shadow-cyber-glow' : 'bg-cyber-surface text-cyber-text-muted'}
+                    ${isToday ? 'ring-2 ring-cyber-primary ring-offset-2 ring-offset-cyber-bg' : ''}
+                    ${hasEntry ? 'bg-gradient-to-br from-cyber-surface to-cyber-border' : ''}
+                    ${isCurrentMonth ? 'hover:scale-105' : ''}
+                  `}
+                >
+                  <div className="h-full flex flex-col items-center justify-between">
+                    <span className={`text-sm font-medium font-mono ${
+                      isToday ? 'text-cyber-primary' : isCurrentMonth ? 'text-cyber-text' : 'text-cyber-text-muted'
+                    }`}>
+                      {format(date, 'd')}
+                    </span>
+                    
+                    {hasEntry && (
+                      <div className="flex flex-col items-center space-y-1">
+                        <div className={`
+                          w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold
+                          ${entry.mood_score === 1 ? 'bg-red-500' : 
+                            entry.mood_score === 2 ? 'bg-orange-500' :
+                            entry.mood_score === 3 ? 'bg-yellow-500' :
+                            entry.mood_score === 4 ? 'bg-cyber-primary' :
+                            'bg-cyber-accent'}
+                        `}>
+                          <span>{MOOD_EMOJIS[entry.mood_score as keyof typeof MOOD_EMOJIS]}</span>
+                        </div>
+                        <div className="w-2 h-2 bg-cyber-primary rounded-full animate-cyber-pulse"></div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Cyberpunk Legend */}
+          <div className="mt-8 pt-6 border-t border-cyber-border">
+            <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8 text-sm text-cyber-text-muted">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-cyber-primary rounded-full animate-cyber-pulse"></div>
+                <span>Neural pattern recorded</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 border-2 border-cyber-primary rounded-full"></div>
+                <span>Current date</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Brain className="w-4 h-4 text-cyber-accent" />
+                <span>Click to view details</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Entry Details Modal */}
-      {selectedEntry && (
-        <MoodEntryModal
-          entry={selectedEntry}
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false)
-            setSelectedEntry(null)
-          }}
-          onUpdate={loadMonthEntries}
-        />
-      )}
+        {/* Entry Details Modal */}
+        {selectedEntry && (
+          <MoodEntryModal
+            entry={selectedEntry}
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false)
+              setSelectedEntry(null)
+            }}
+            onUpdate={fetchMoodEntries}
+          />
+        )}
+      </div>
+      
+      {/* AI Assistant */}
+      <AIAssistant />
     </div>
   )
 }

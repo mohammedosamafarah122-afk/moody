@@ -1,5 +1,5 @@
 import React from 'react'
-import type { MoodEntry } from '../../services/moodService'
+import type { MoodEntry } from '../../contexts/MoodContext'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 
 interface ActivityCorrelationProps {

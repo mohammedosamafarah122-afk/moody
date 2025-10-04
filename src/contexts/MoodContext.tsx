@@ -66,40 +66,76 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const addMoodEntry = useCallback(async (mood: string, notes?: string, intensity?: number) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    try {
+      console.log('Starting addMoodEntry...');
+      
+      // Check authentication
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.error('Auth error:', authError);
+        throw new Error('Authentication failed');
+      }
+      
+      if (!user) {
+        console.error('No user found');
+        throw new Error('Please log in to save moods');
+      }
 
-    // Convert mood string to mood_score number
-    const moodScoreMap: Record<string, number> = {
-      '😊 happy': 5, '😐 neutral': 3, '😔 sad': 2, '😡 angry': 1, '😴 tired': 2,
-      '😰 anxious': 2, '🤩 excited': 5, '😌 relaxed': 4,
-      'happy': 5, 'neutral': 3, 'sad': 2, 'angry': 1, 'tired': 2,
-      'anxious': 2, 'excited': 5, 'relaxed': 4
-    }
+      console.log('User:', user.id);
 
-    // Extract mood label from emoji + label format
-    const moodLabel = mood.replace(/^[^\w\s]*\s*/, '').toLowerCase()
-    const mood_score = moodScoreMap[moodLabel] || 3
+      // Format date
+      const today = new Date().toISOString().split('T')[0];
+      console.log('Date:', today);
 
-    const today = new Date().toISOString().split('T')[0];
-    
-    const { data, error } = await supabase
-      .from('mood_entries')
-      .upsert({
+      // Convert mood string to mood_score number
+      const moodScoreMap: Record<string, number> = {
+        '😊 happy': 5, '😐 neutral': 3, '😔 sad': 2, '😡 angry': 1, '😴 tired': 2,
+        '😰 anxious': 2, '🤩 excited': 5, '😌 relaxed': 4,
+        'happy': 5, 'neutral': 3, 'sad': 2, 'angry': 1, 'tired': 2,
+        'anxious': 2, 'excited': 5, 'relaxed': 4
+      }
+
+      // Extract mood label from emoji + label format
+      const moodLabel = mood.replace(/^[^\w\s]*\s*/, '').toLowerCase()
+      const mood_score = moodScoreMap[moodLabel] || 3
+
+      // Prepare data
+      const moodData = {
         user_id: user.id,
         date: today,
         mood_score,
         journal_entry: notes || '',
         intensity: intensity || 5,
         updated_at: new Date().toISOString()
-      })
-      .select()
-      .single();
+      };
 
-    if (error) throw error;
-    
-    await fetchMoodEntries();
-    return data;
+      console.log('Saving data:', moodData);
+
+      // Save to database
+      const { data, error } = await supabase
+        .from('mood_entries')
+        .upsert(moodData, {
+          onConflict: 'user_id,date',
+          ignoreDuplicates: false
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error(`Database error: ${error.message}`);
+      }
+
+      console.log('Save successful:', data);
+      
+      // Refresh the entries
+      await fetchMoodEntries();
+      
+      return data;
+    } catch (error: any) {
+      console.error('Error in addMoodEntry:', error);
+      throw error; // Re-throw to handle in component
+    }
   }, [fetchMoodEntries]);
 
   const updateMoodEntry = useCallback(async (id: string, updates: Partial<MoodEntry>) => {

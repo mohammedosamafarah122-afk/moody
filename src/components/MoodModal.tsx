@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMood } from '../contexts/MoodContext';
-import { X } from 'lucide-react';
+import { X, Zap, Brain, Activity } from 'lucide-react';
 
 interface MoodModalProps {
   isOpen: boolean;
@@ -8,18 +8,19 @@ interface MoodModalProps {
 }
 
 const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
-  const [selectedMood, setSelectedMood] = useState('');
+  const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [notes, setNotes] = useState('');
   const [intensity, setIntensity] = useState(5);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { addMoodEntry } = useMood();
 
   const moodOptions = [
-    { emoji: '😊', label: 'Happy' },
-    { emoji: '😐', label: 'Neutral' },
-    { emoji: '😔', label: 'Sad' },
-    { emoji: '😡', label: 'Angry' },
-    { emoji: '😴', label: 'Tired' },
+    { emoji: '😊', label: 'Happy', score: 5, color: 'cyber-primary', description: 'Positive neural patterns detected' },
+    { emoji: '😐', label: 'Neutral', score: 3, color: 'cyber-accent', description: 'Baseline neural activity' },
+    { emoji: '😔', label: 'Sad', score: 2, color: 'cyber-secondary', description: 'Low frequency patterns' },
+    { emoji: '😡', label: 'Angry', score: 1, color: 'red-500', description: 'High intensity signals' },
+    { emoji: '😴', label: 'Tired', score: 2, color: 'purple-500', description: 'Reduced neural activity' },
   ];
 
   const handleSubmit = async () => {
@@ -28,57 +29,80 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
       return;
     }
 
+    setIsSubmitting(true);
+    
     try {
-      await addMoodEntry(selectedMood, notes, intensity);
-      setSelectedMood('');
+      console.log('Attempting to save mood:', { selectedMood, notes, intensity });
+      await addMoodEntry(
+        moodOptions.find(m => m.score === selectedMood)?.label || 'Unknown',
+        notes,
+        intensity
+      );
+      console.log('Save successful');
+      
+      setSelectedMood(null);
       setNotes('');
       setIntensity(5);
       onClose();
-      alert('Mood saved successfully!');
-    } catch (error) {
-      alert('Failed to save mood');
+      alert('✅ Mood saved successfully!');
+    } catch (error: any) {
+      console.error('Save failed:', error);
+      alert(`❌ Failed to save mood: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-bold text-gray-800">How are you feeling?</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full">
-            <X size={20} />
+    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50">
+      <div className="cyber-modal max-w-md w-full max-h-[90vh] overflow-y-auto">
+        {/* Cyberpunk Header */}
+        <div className="flex justify-between items-center p-6 border-b border-cyber-border">
+          <div className="flex items-center">
+            <Brain className="w-6 h-6 text-cyber-primary mr-3" />
+            <h2 className="cyber-text text-xl font-bold">Neural Input Interface</h2>
+          </div>
+          <button 
+            onClick={onClose} 
+            className="p-2 hover:bg-cyber-surface rounded-lg transition-all duration-300 hover:shadow-cyber-glow"
+          >
+            <X size={20} className="text-cyber-text-muted hover:text-cyber-primary" />
           </button>
         </div>
 
         {/* Mood Selection */}
         <div className="p-6">
-          <h3 className="font-semibold mb-4 text-gray-700">Select your mood</h3>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="flex items-center mb-4">
+            <Activity className="w-5 h-5 text-cyber-accent mr-2" />
+            <h3 className="cyber-label">Select Neural Pattern</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             {moodOptions.map((mood) => (
               <button
                 key={mood.label}
-                onClick={() => setSelectedMood(`${mood.emoji} ${mood.label}`)}
-                className={`p-4 rounded-xl transition-all ${
-                  selectedMood === `${mood.emoji} ${mood.label}`
-                    ? 'bg-blue-500 text-white transform scale-105 shadow-lg'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                }`}
+                 onClick={() => setSelectedMood(mood.score)}
+                 className={`cyber-mood-indicator ${
+                   selectedMood === mood.score ? 'selected' : ''
+                 }`}
               >
-                <div className="text-2xl mb-2">{mood.emoji}</div>
-                <div className="text-sm font-medium">{mood.label}</div>
+                <div className="text-3xl mb-2">{mood.emoji}</div>
+                <div className="text-sm font-medium text-cyber-text">{mood.label}</div>
+                <div className="text-xs text-cyber-text-muted mt-1">{mood.description}</div>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Intensity */}
-        <div className="p-6 border-t">
+        {/* Intensity Slider */}
+        <div className="p-6 border-t border-cyber-border">
           <div className="flex justify-between mb-2">
-            <h3 className="font-semibold text-gray-700">Intensity</h3>
-            <span className="text-sm text-gray-600">{intensity}/10</span>
+            <div className="flex items-center">
+              <Zap className="w-5 h-5 text-cyber-primary mr-2" />
+              <h3 className="cyber-label">Neural Intensity</h3>
+            </div>
+            <span className="text-cyber-accent text-sm font-mono">{intensity}/10</span>
           </div>
           <input
             type="range"
@@ -86,40 +110,51 @@ const MoodModal: React.FC<MoodModalProps> = ({ isOpen, onClose }) => {
             max="10"
             value={intensity}
             onChange={(e) => setIntensity(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            className="cyber-slider w-full"
           />
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <div className="flex justify-between text-xs text-cyber-text-muted mt-2">
             <span>Low</span>
             <span>High</span>
           </div>
         </div>
 
         {/* Notes */}
-        <div className="p-6 border-t">
-          <h3 className="font-semibold mb-3 text-gray-700">Notes (optional)</h3>
+        <div className="p-6 border-t border-cyber-border">
+          <h3 className="cyber-label mb-3">Neural Notes (Optional)</h3>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="What's on your mind?"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none"
+            placeholder="Record additional neural patterns..."
+            className="cyber-textarea w-full"
             rows={3}
           />
         </div>
 
         {/* Actions */}
-        <div className="p-6 border-t flex gap-3">
+        <div className="p-6 border-t border-cyber-border flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+            disabled={isSubmitting}
+            className="cyber-btn-secondary flex-1"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            disabled={!selectedMood}
-            className="flex-1 px-4 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!selectedMood || isSubmitting}
+            className="cyber-btn-primary flex-1 flex items-center justify-center gap-2"
           >
-            Save Mood
+            {isSubmitting ? (
+              <>
+                <div className="cyber-spinner w-4 h-4"></div>
+                Processing...
+              </>
+            ) : (
+              <>
+                <Zap className="w-4 h-4" />
+                Save Pattern
+              </>
+            )}
           </button>
         </div>
       </div>

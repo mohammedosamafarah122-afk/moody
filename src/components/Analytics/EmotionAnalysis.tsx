@@ -1,5 +1,5 @@
 import React from 'react'
-import type { MoodEntry } from '../../services/moodService'
+import type { MoodEntry } from '../../contexts/MoodContext'
 
 interface EmotionAnalysisProps {
   entries: MoodEntry[]
