@@ -7,7 +7,7 @@ const QuickActions: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addMoodEntry } = useMood();
 
-  const handleQuickMood = async (moodScore: number, moodLabel: string) => {
+  const handleQuickMood = async (_moodScore: number, moodLabel: string) => {
     try {
       // Add some default emotions and activities based on mood
       const defaultEmotions = getDefaultEmotions(moodLabel);
