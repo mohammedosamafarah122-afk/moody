@@ -48,32 +48,32 @@ const QuickActions: React.FC = () => {
 
   const quickMoods = [
     { 
-      emoji: '😊', 
-      label: 'Happy', 
+      emoji: '😄', 
+      label: 'Very Happy', 
       score: 5,
       bg: 'bg-gradient-to-br from-cyber-primary to-cyber-accent',
       description: 'Positive vibes'
     },
     { 
+      emoji: '😊', 
+      label: 'Happy', 
+      score: 4,
+      bg: 'bg-gradient-to-br from-cyber-accent to-blue-500',
+      description: 'Good vibes'
+    },
+    { 
       emoji: '😐', 
       label: 'Neutral', 
       score: 3,
-      bg: 'bg-gradient-to-br from-cyber-accent to-blue-500',
+      bg: 'bg-gradient-to-br from-cyber-secondary to-pink-500',
       description: 'Baseline state'
     },
     { 
       emoji: '😔', 
       label: 'Sad', 
       score: 2,
-      bg: 'bg-gradient-to-br from-cyber-secondary to-pink-500',
-      description: 'Low energy'
-    },
-    { 
-      emoji: '😡', 
-      label: 'Angry', 
-      score: 1,
       bg: 'bg-gradient-to-br from-red-500 to-orange-500',
-      description: 'High intensity'
+      description: 'Low energy'
     },
   ];
 

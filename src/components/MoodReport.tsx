@@ -169,7 +169,7 @@ Thank you for using Moody to track your neural patterns!
     }
   };
 
-  const getMoodEmoji = (moodLabel: string) => {
+  const getMoodEmojiByLabel = (moodLabel: string) => {
     const emojiMap: { [key: string]: string } = {
       'Terrible': '😢',
       'Poor': '😔',
@@ -261,7 +261,7 @@ Thank you for using Moody to track your neural patterns!
                   <h3 className="text-cyber-text-muted text-sm font-medium uppercase tracking-wider">Common Pattern</h3>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">{getMoodEmoji(report.mostCommonMood)}</span>
+                  <span className="text-2xl">{getMoodEmojiByLabel(report.mostCommonMood)}</span>
                   <p className="cyber-text text-lg font-bold truncate" title={report.mostCommonMood}>
                     {report.mostCommonMood}
                   </p>
@@ -323,7 +323,7 @@ Thank you for using Moody to track your neural patterns!
                     return (
                       <div key={mood} className="flex items-center justify-between">
                         <div className="flex items-center space-x-3 flex-1">
-                          <span className="text-2xl">{getMoodEmoji(mood)}</span>
+                          <span className="text-2xl">{getMoodEmojiByLabel(mood)}</span>
                           <span className="text-cyber-text font-medium flex-1">{mood}</span>
                           <span className="text-cyber-text-muted text-sm w-12 text-right font-mono">{count}</span>
                         </div>

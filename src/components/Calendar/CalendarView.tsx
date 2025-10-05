@@ -5,13 +5,7 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Brain } from 'luci
 import { MoodEntryModal } from './MoodEntryModal'
 import { AIAssistant } from '../AIAssistant/AIAssistant'
 
-const MOOD_EMOJIS = {
-  1: '😢',
-  2: '😞',
-  3: '😐',
-  4: '😊',
-  5: '😄'
-}
+import { getMoodEmoji } from '../../constants/moodEmojis'
 
 export const CalendarView: React.FC = () => {
   const { moodEntries, loading, fetchMoodEntries } = useMood()
@@ -153,7 +147,7 @@ export const CalendarView: React.FC = () => {
                             entry.mood_score === 4 ? 'bg-cyber-primary' :
                             'bg-cyber-accent'}
                         `}>
-                          <span>{MOOD_EMOJIS[entry.mood_score as keyof typeof MOOD_EMOJIS]}</span>
+                          <span>{getMoodEmoji(entry.mood_score)}</span>
                         </div>
                         <div className="w-2 h-2 bg-cyber-primary rounded-full animate-cyber-pulse"></div>
                       </div>

@@ -90,10 +90,10 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Convert mood string to mood_score number
       const moodScoreMap: Record<string, number> = {
-        '😊 happy': 5, '😐 neutral': 3, '😔 sad': 2, '😡 angry': 1, '😴 tired': 2,
-        '😰 anxious': 2, '🤩 excited': 5, '😌 relaxed': 4,
-        'happy': 5, 'neutral': 3, 'sad': 2, 'angry': 1, 'tired': 2,
-        'anxious': 2, 'excited': 5, 'relaxed': 4
+        '😄 very happy': 5, '😊 happy': 4, '😐 neutral': 3, '😔 sad': 2, '😢 very sad': 1,
+        '😡 angry': 1, '😴 tired': 2, '😰 anxious': 2, '🤩 excited': 5, '😌 relaxed': 4,
+        'very happy': 5, 'happy': 4, 'neutral': 3, 'sad': 2, 'very sad': 1,
+        'angry': 1, 'tired': 2, 'anxious': 2, 'excited': 5, 'relaxed': 4
       }
 
       // Extract mood label from emoji + label format
@@ -114,10 +114,14 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updated_at: new Date().toISOString()
       };
 
-      console.log('Saving data:', moodData);
-      console.log('Emotions array:', emotions);
-      console.log('Activities array:', activities);
-      console.log('Journal with patterns:', journalWithPatterns);
+      console.log('🔍 MoodContext Debug - Processing data:');
+      console.log('Raw emotions array:', emotions);
+      console.log('Raw activities array:', activities);
+      console.log('Raw notes:', notes);
+      console.log('Emotion tags:', emotionTags);
+      console.log('Activity tags:', activityTags);
+      console.log('Final journal with patterns:', journalWithPatterns);
+      console.log('Complete mood data:', moodData);
 
       // Save to database
       const { data, error } = await supabase
@@ -134,8 +138,10 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(`Database error: ${error.message}`);
       }
 
-      console.log('Save successful:', data);
+      console.log('✅ MoodContext Debug - Save successful:');
+      console.log('Saved data:', data);
       console.log('Saved journal entry:', data.journal_entry);
+      console.log('Has hashtags?', data.journal_entry?.includes('#'));
       
       // Refresh the entries
       await fetchMoodEntries();

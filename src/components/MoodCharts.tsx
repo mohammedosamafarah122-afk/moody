@@ -1,5 +1,6 @@
 import React from 'react';
 import type { MoodEntry } from '../lib/supabase';
+import { getMoodEmoji } from '../constants/moodEmojis';
 
 interface MoodChartsProps {
   moodEntries: MoodEntry[];
@@ -35,16 +36,6 @@ const MoodCharts: React.FC<MoodChartsProps> = ({ moodEntries }) => {
   const weeklyTrend = getWeeklyTrend();
   const maxCount = Math.max(...weeklyTrend.map(w => w.count), 1);
 
-  const getMoodEmoji = (moodScore: number) => {
-    const emojiMap: { [key: number]: string } = {
-      1: '😢',
-      2: '😔',
-      3: '😐',
-      4: '😊',
-      5: '🤩',
-    };
-    return emojiMap[moodScore] || '😐';
-  };
 
   const getMoodColor = (moodScore: number) => {
     const colorMap: { [key: number]: string } = {

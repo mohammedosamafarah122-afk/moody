@@ -2,28 +2,13 @@ import React, { useState } from 'react'
 import { format } from 'date-fns'
 import { MoodService, type MoodEntry } from '../../services/moodService'
 import { X, Edit2, Trash2, Save, Smile, Activity, BookOpen, Calendar } from 'lucide-react'
+import { getMoodEmoji, getMoodLabel } from '../../constants/moodEmojis'
 
 interface MoodEntryModalProps {
   entry: MoodEntry
   isOpen: boolean
   onClose: () => void
   onUpdate: () => void
-}
-
-const MOOD_LABELS = {
-  1: 'Very Sad',
-  2: 'Sad',
-  3: 'Neutral',
-  4: 'Happy',
-  5: 'Very Happy'
-}
-
-const MOOD_EMOJIS = {
-  1: '😢',
-  2: '😞',
-  3: '😐',
-  4: '😊',
-  5: '😄'
 }
 
 const EMOTIONS = [
@@ -181,18 +166,18 @@ export const MoodEntryModal: React.FC<MoodEntryModalProps> = ({
                       editData.mood_score === score ? 'ring-4 ring-offset-2' : ''
                     }`}
                   >
-                    <span className="text-2xl">{MOOD_EMOJIS[score as keyof typeof MOOD_EMOJIS]}</span>
+                    <span className="text-2xl">{getMoodEmoji(score)}</span>
                   </button>
                 ))}
               </div>
             ) : (
               <div className="flex items-center justify-center space-x-4">
                 <div className={`mood-button mood-${entry.mood_score}`}>
-                  <span className="text-2xl">{MOOD_EMOJIS[entry.mood_score as keyof typeof MOOD_EMOJIS]}</span>
+                  <span className="text-2xl">{getMoodEmoji(entry.mood_score)}</span>
                 </div>
                 <div className="text-center">
                   <p className="text-lg font-semibold text-gray-900">
-                    {MOOD_LABELS[entry.mood_score as keyof typeof MOOD_LABELS]}
+                    {getMoodLabel(entry.mood_score)}
                   </p>
                   <p className="text-sm text-gray-600">Score: {entry.mood_score}/5</p>
                 </div>

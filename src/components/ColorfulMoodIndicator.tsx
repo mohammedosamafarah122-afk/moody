@@ -65,7 +65,7 @@ export const ColorfulMoodIndicator: React.FC<ColorfulMoodIndicatorProps> = ({
         color: 'from-purple-400 to-indigo-600',
         bgColor: 'from-purple-50 to-indigo-100',
         textColor: 'text-purple-700',
-        emoji: '🤩',
+        emoji: '😄',
         description: 'Feeling amazing',
         shadow: 'shadow-purple-400/40'
       }

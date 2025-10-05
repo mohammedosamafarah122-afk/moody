@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Hashtag Patterns</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Debug Hashtag Patterns</h1>
+    
+    <div class="test-section">
+        <h2>Test Pattern Flow</h2>
+        <p>Follow these steps to debug the pattern functionality:</p>
+        
+        <h3>1. Open Application</h3>
+        <p>Visit: <a href="http://localhost:5173" target="_blank">http://localhost:5173</a></p>
+        
+        <h3>2. Open Browser Console</h3>
+        <p>Press F12 → Console tab</p>
+        
+        <h3>3. Test MoodForm</h3>
+        <ol>
+            <li>Go to "Log Mood" page</li>
+            <li>Select emotions: Happy, Excited</li>
+            <li>Select activities: Exercise, Music</li>
+            <li>Add notes: "Feeling great!"</li>
+            <li>Click "Save Neural Pattern"</li>
+        </ol>
+        
+        <h3>4. Check Console Logs</h3>
+        <p>Look for these logs:</p>
+        <pre>
+Starting addMoodEntry...
+Emotions array: ["Happy", "Excited"]
+Activities array: ["Exercise", "Music"]
+Journal with patterns: "Feeling great! #Happy #Excited #Exercise #Music"
+Save successful: {journal_entry: "Feeling great! #Happy #Excited #Exercise #Music"}
+        </pre>
+        
+        <h3>5. Test MoodModal</h3>
+        <ol>
+            <li>Go to Dashboard</li>
+            <li>Click "Advanced Neural Input"</li>
+            <li>Select a mood</li>
+            <li>Select emotions and activities</li>
+            <li>Add notes</li>
+            <li>Click "Save Pattern"</li>
+        </ol>
+        
+        <h3>6. Check Analytics</h3>
+        <ol>
+            <li>Go to Analytics page</li>
+            <li>Check "Emotional Pattern Analysis"</li>
+            <li>Check "Activity Pattern Analysis"</li>
+            <li>Verify hashtags are being parsed</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>Common Issues</h2>
+        
+        <h3>Issue 1: No Console Logs</h3>
+        <p><strong>Problem:</strong> No logs appear when saving mood</p>
+        <p><strong>Solution:</strong> Check if user is logged in</p>
+        
+        <h3>Issue 2: Empty Arrays</h3>
+        <p><strong>Problem:</strong> Emotions/Activities arrays are empty: []</p>
+        <p><strong>Solution:</strong> Check UI selection logic</p>
+        
+        <h3>Issue 3: No Hashtags in Journal</h3>
+        <p><strong>Problem:</strong> Journal entry doesn't contain hashtags</p>
+        <p><strong>Solution:</strong> Check MoodContext hashtag processing</p>
+        
+        <h3>Issue 4: Analytics Not Showing</h3>
+        <p><strong>Problem:</strong> Analytics show "No data available"</p>
+        <p><strong>Solution:</strong> Check hashtag parsing in analytics components</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>Manual Database Check</h2>
+        <p>Run this in Supabase SQL Editor to check saved data:</p>
+        <pre>
+SELECT id, date, mood_score, journal_entry, created_at
+FROM mood_entries 
+WHERE journal_entry LIKE '%#%'
+ORDER BY created_at DESC
+LIMIT 5;
+        </pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>Expected Results</h2>
+        <ul>
+            <li>Console shows pattern arrays being processed</li>
+            <li>Journal entries contain hashtags like #Happy #Exercise</li>
+            <li>Analytics parse and display pattern data</li>
+            <li>Database contains entries with hashtags</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import { useMood } from '../../contexts/MoodContext'
 import { Calendar, Save, Smile, Activity, BookOpen, Brain, Zap, Target } from 'lucide-react'
 import { AIAssistant } from '../AIAssistant/AIAssistant'
+import { MOOD_EMOJIS, MOOD_LABELS } from '../../constants/moodEmojis'
 
 const EMOTIONS = [
   'Happy', 'Sad', 'Angry', 'Anxious', 'Excited', 'Calm', 'Frustrated', 
@@ -13,22 +14,6 @@ const ACTIVITIES = [
   'Work', 'Exercise', 'Sleep', 'Socializing', 'Reading', 'Cooking', 'Gaming',
   'Music', 'Art', 'Nature', 'Learning', 'Cleaning', 'Shopping', 'Travel', 'Meditation'
 ]
-
-const MOOD_LABELS = {
-  1: 'Very Sad',
-  2: 'Sad',
-  3: 'Neutral',
-  4: 'Happy',
-  5: 'Very Happy'
-}
-
-const MOOD_EMOJIS = {
-  1: '😢',
-  2: '😞',
-  3: '😐',
-  4: '😊',
-  5: '😄'
-}
 
 interface MoodFormProps {
   selectedDate?: string
@@ -61,21 +46,31 @@ export const MoodForm: React.FC<MoodFormProps> = ({
   }
 
   const handleEmotionToggle = (emotion: string) => {
-    setFormData(prev => ({
-      ...prev,
-      emotions: prev.emotions.includes(emotion)
+    console.log('🔍 Emotion clicked:', emotion);
+    setFormData(prev => {
+      const newEmotions = prev.emotions.includes(emotion)
         ? prev.emotions.filter(e => e !== emotion)
-        : [...prev.emotions, emotion]
-    }))
+        : [...prev.emotions, emotion];
+      console.log('🔍 New emotions array:', newEmotions);
+      return {
+        ...prev,
+        emotions: newEmotions
+      };
+    });
   }
 
   const handleActivityToggle = (activity: string) => {
-    setFormData(prev => ({
-      ...prev,
-      activities: prev.activities.includes(activity)
+    console.log('🔍 Activity clicked:', activity);
+    setFormData(prev => {
+      const newActivities = prev.activities.includes(activity)
         ? prev.activities.filter(a => a !== activity)
-        : [...prev.activities, activity]
-    }))
+        : [...prev.activities, activity];
+      console.log('🔍 New activities array:', newActivities);
+      return {
+        ...prev,
+        activities: newActivities
+      };
+    });
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,6 +82,13 @@ export const MoodForm: React.FC<MoodFormProps> = ({
     try {
       const moodString = `${MOOD_EMOJIS[formData.mood_score as keyof typeof MOOD_EMOJIS]} ${MOOD_LABELS[formData.mood_score as keyof typeof MOOD_LABELS]}`
       const notes = formData.journal_entry
+      
+      console.log('🔍 MoodForm Debug - Before addMoodEntry:');
+      console.log('Mood string:', moodString);
+      console.log('Notes:', notes);
+      console.log('Intensity:', formData.intensity);
+      console.log('Emotions array:', formData.emotions);
+      console.log('Activities array:', formData.activities);
       
       await addMoodEntry(moodString, notes, formData.intensity, formData.emotions, formData.activities)
       
@@ -191,6 +193,11 @@ export const MoodForm: React.FC<MoodFormProps> = ({
               <label className="cyber-label flex items-center space-x-2">
                 <Smile className="h-4 w-4" />
                 <span>Emotional Patterns (Optional)</span>
+                {formData.emotions.length > 0 && (
+                  <span className="text-cyber-accent text-sm">
+                    ({formData.emotions.length} selected)
+                  </span>
+                )}
               </label>
               <div className="flex flex-wrap gap-2">
                 {EMOTIONS.map((emotion) => (
@@ -198,16 +205,21 @@ export const MoodForm: React.FC<MoodFormProps> = ({
                     key={emotion}
                     type="button"
                     onClick={() => handleEmotionToggle(emotion)}
-                    className={`cyber-badge ${
+                    className={`cyber-badge cursor-pointer transition-all ${
                       formData.emotions.includes(emotion)
-                        ? 'bg-cyber-primary bg-opacity-20 text-cyber-primary border-cyber-primary'
-                        : 'bg-cyber-border bg-opacity-20 text-cyber-text-muted border-cyber-border hover:border-cyber-primary'
+                        ? 'bg-cyber-primary bg-opacity-30 text-cyber-primary border-cyber-primary shadow-cyber-glow'
+                        : 'bg-cyber-border bg-opacity-20 text-cyber-text-muted border-cyber-border hover:border-cyber-primary hover:bg-opacity-30'
                     }`}
                   >
                     {emotion}
                   </button>
                 ))}
               </div>
+              {formData.emotions.length > 0 && (
+                <div className="mt-2 text-sm text-cyber-accent">
+                  Selected: {formData.emotions.join(', ')}
+                </div>
+              )}
             </div>
 
             {/* Activities */}
@@ -215,6 +227,11 @@ export const MoodForm: React.FC<MoodFormProps> = ({
               <label className="cyber-label flex items-center space-x-2">
                 <Activity className="h-4 w-4" />
                 <span>Activity Patterns (Optional)</span>
+                {formData.activities.length > 0 && (
+                  <span className="text-cyber-accent text-sm">
+                    ({formData.activities.length} selected)
+                  </span>
+                )}
               </label>
               <div className="flex flex-wrap gap-2">
                 {ACTIVITIES.map((activity) => (
@@ -222,16 +239,21 @@ export const MoodForm: React.FC<MoodFormProps> = ({
                     key={activity}
                     type="button"
                     onClick={() => handleActivityToggle(activity)}
-                    className={`cyber-badge ${
+                    className={`cyber-badge cursor-pointer transition-all ${
                       formData.activities.includes(activity)
-                        ? 'bg-cyber-accent bg-opacity-20 text-cyber-accent border-cyber-accent'
-                        : 'bg-cyber-border bg-opacity-20 text-cyber-text-muted border-cyber-border hover:border-cyber-accent'
+                        ? 'bg-cyber-accent bg-opacity-30 text-cyber-accent border-cyber-accent shadow-cyber-glow'
+                        : 'bg-cyber-border bg-opacity-20 text-cyber-text-muted border-cyber-border hover:border-cyber-accent hover:bg-opacity-30'
                     }`}
                   >
                     {activity}
                   </button>
                 ))}
               </div>
+              {formData.activities.length > 0 && (
+                <div className="mt-2 text-sm text-cyber-accent">
+                  Selected: {formData.activities.join(', ')}
+                </div>
+              )}
             </div>
 
             {/* Journal Entry */}

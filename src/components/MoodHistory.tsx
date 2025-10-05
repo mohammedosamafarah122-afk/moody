@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useMood } from '../contexts/MoodContext';
 import { Calendar, Search, Brain, Filter, Clock, Zap, Activity } from 'lucide-react';
+import { getMoodEmoji } from '../constants/moodEmojis';
 
 const MoodHistory: React.FC = () => {
   const { moodEntries, loading, fetchMoodEntries } = useMood();
@@ -60,17 +61,6 @@ const MoodHistory: React.FC = () => {
       5: 'bg-cyber-accent bg-opacity-20 text-cyber-accent border-cyber-accent',
     };
     return colorMap[moodScore] || 'bg-cyber-border bg-opacity-20 text-cyber-text-muted border-cyber-border';
-  };
-
-  const getMoodEmoji = (moodScore: number) => {
-    const emojiMap: { [key: number]: string } = {
-      1: '😢',
-      2: '😔',
-      3: '😐',
-      4: '😊',
-      5: '🤩',
-    };
-    return emojiMap[moodScore] || '😐';
   };
 
   const formatDate = (dateString: string) => {

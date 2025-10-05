@@ -6,6 +6,7 @@ import { MoodTrendChart } from './MoodTrendChart'
 import { EmotionAnalysis } from './EmotionAnalysis'
 import { ActivityCorrelation } from './ActivityCorrelation'
 import { AIAssistant } from '../AIAssistant/AIAssistant'
+import { DebugPatterns } from '../DebugPatterns'
 
 export const Analytics: React.FC = () => {
   const { moodEntries, loading, fetchMoodEntries } = useMood()
@@ -223,6 +224,9 @@ export const Analytics: React.FC = () => {
               </div>
               <ActivityCorrelation entries={entries} />
             </div>
+
+            {/* Debug Patterns */}
+            <DebugPatterns />
           </>
         )}
       </div>
